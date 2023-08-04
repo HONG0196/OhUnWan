@@ -15,13 +15,13 @@
 		F113DFF42A7A2FBD00E2F1CC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F113DFF22A7A2FBD00E2F1CC /* LaunchScreen.storyboard */; };
 		F113E0002A7A319F00E2F1CC /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F113DFFF2A7A319F00E2F1CC /* LoginViewModel.swift */; };
 		F113E0022A7A372B00E2F1CC /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F113E0012A7A372B00E2F1CC /* HomeViewController.swift */; };
-		F113E0042A7A374E00E2F1CC /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F113E0032A7A374E00E2F1CC /* HomeViewModel.swift */; };
 		F113E0062A7A3A6300E2F1CC /* Networking.swift in Sources */ = {isa = PBXBuildFile; fileRef = F113E0052A7A3A6300E2F1CC /* Networking.swift */; };
 		F113E0082A7A3ADB00E2F1CC /* LoginResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F113E0072A7A3ADB00E2F1CC /* LoginResponse.swift */; };
 		F113E00B2A7A3E2300E2F1CC /* UserPhotoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F113E0092A7A3E2300E2F1CC /* UserPhotoCell.swift */; };
 		F113E00C2A7A3E2300E2F1CC /* UserPhotoCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F113E00A2A7A3E2300E2F1CC /* UserPhotoCell.xib */; };
 		F113E00E2A7CA7C200E2F1CC /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F113E00D2A7CA7C200E2F1CC /* SignUpViewController.swift */; };
 		F113E0102A7CA8E300E2F1CC /* SignUpViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F113E00F2A7CA8E300E2F1CC /* SignUpViewModel.swift */; };
+		F113E0122A7CEA8400E2F1CC /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F113E0112A7CEA8400E2F1CC /* HomeViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,13 +35,13 @@
 		F113DFF52A7A2FBD00E2F1CC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F113DFFF2A7A319F00E2F1CC /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		F113E0012A7A372B00E2F1CC /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
-		F113E0032A7A374E00E2F1CC /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		F113E0052A7A3A6300E2F1CC /* Networking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Networking.swift; sourceTree = "<group>"; };
 		F113E0072A7A3ADB00E2F1CC /* LoginResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginResponse.swift; sourceTree = "<group>"; };
 		F113E0092A7A3E2300E2F1CC /* UserPhotoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPhotoCell.swift; sourceTree = "<group>"; };
 		F113E00A2A7A3E2300E2F1CC /* UserPhotoCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = UserPhotoCell.xib; sourceTree = "<group>"; };
 		F113E00D2A7CA7C200E2F1CC /* SignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewController.swift; sourceTree = "<group>"; };
 		F113E00F2A7CA8E300E2F1CC /* SignUpViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewModel.swift; sourceTree = "<group>"; };
+		F113E0112A7CEA8400E2F1CC /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,7 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				F113DFFF2A7A319F00E2F1CC /* LoginViewModel.swift */,
-				F113E0032A7A374E00E2F1CC /* HomeViewModel.swift */,
+				F113E0112A7CEA8400E2F1CC /* HomeViewModel.swift */,
 				F113E00F2A7CA8E300E2F1CC /* SignUpViewModel.swift */,
 			);
 			path = VM;
@@ -199,7 +199,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F113E0022A7A372B00E2F1CC /* HomeViewController.swift in Sources */,
-				F113E0042A7A374E00E2F1CC /* HomeViewModel.swift in Sources */,
+				F113E0122A7CEA8400E2F1CC /* HomeViewModel.swift in Sources */,
 				F113E0002A7A319F00E2F1CC /* LoginViewModel.swift in Sources */,
 				F113E00B2A7A3E2300E2F1CC /* UserPhotoCell.swift in Sources */,
 				F113E00E2A7CA7C200E2F1CC /* SignUpViewController.swift in Sources */,
