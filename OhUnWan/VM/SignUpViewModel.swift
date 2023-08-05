@@ -21,9 +21,11 @@ class SignUpViewModel {
     private(set) var signUpStatus: SignUpStatus = .none
     
     // 회원가입 요청 메서드
-    func signUp(with email: String, password: String, completion: @escaping (Bool) -> Void) {
+    func signUp(with name: String, email: String, password: String, completion: @escaping (Bool) -> Void) {
         // 입력값의 유효성 검사를 수행합니다.
-        guard isValidEmail(email) && isValidPassword(password) else {
+        guard isValidName(name),
+              isValidEmail(email),
+              isValidPassword(password) else {
             signUpStatus = .validationFailed
             completion(false)
             return
@@ -41,6 +43,13 @@ class SignUpViewModel {
                 completion(false)
             }
         }
+    }
+
+    // 이름 유효성 검사
+    private func isValidName(_ name: String) -> Bool {
+        // 영어 또는 한글로만 구성되어 있으며 최소 1자 이상
+        let namePattern = "^[a-zA-Z가-힣]+$"
+        return NSPredicate(format: "SELF MATCHES %@", namePattern).evaluate(with: name)
     }
     
     // 이메일 유효성 검사
