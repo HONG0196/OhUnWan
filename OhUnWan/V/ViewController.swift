@@ -198,26 +198,35 @@ final class ViewController: UIViewController {
         passwordTextField.isSecureTextEntry.toggle()
     }
     
-    // MARK: - 로그인 버튼 눌림 ===> 뷰모델에 전달 ⭐️⭐️⭐️ (Input)
     @objc func loginButtonTapped() {
-        viewModel.handleUserLogin(fromCurrentVC: self, animated: true)
+        viewModel.loginUser { loginStatus in
+            switch loginStatus {
+            case .authenticated:
+                let viewController = self
+                self.viewModel.goToNextScreen(from: viewController)
+            case .loginDenied:
+                // Handle login denial
+                self.showAlert(message: "로그인에 실패했습니다. 다시 시도해주세요.")
+            case .validationFailed:
+                // Handle validation failure
+                self.showAlert(message: "이메일과 비밀번호를 모두 입력해주세요.")
+            case .none:
+                // Handle initial state
+                break
+            }
+        }
+    }
+
+    func showAlert(message: String) {
+        let alert = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "확인", style: .default, handler: nil)
+        alert.addAction(okAction)
+        present(alert, animated: true, completion: nil)
     }
     
-    // MARK: - 회원가입화면 이동 //Alert
+    // MARK: - 회원가입화면 이동
     @objc func SignUpButtonTapped() {
-//        // 얼럿화면을 위한 뷰모델을 따로 만드는 것도 가능
-//        let alert = UIAlertController(title: "Sign up", message: "가입하시겠습니다?", preferredStyle: .alert)
-//        let success = UIAlertAction(title: "확인", style: .default) { action in
-//            print("확인버튼이 눌렸습니다.")
-//        }
-//        let cancel = UIAlertAction(title: "취소", style: .cancel) { action in
-//            print("취소버튼이 눌렸습니다.")
-//        }
-//        alert.addAction(success)
-//        alert.addAction(cancel)
-//
-//        self.present(alert, animated: true, completion: nil)
-        
+
         // 뷰컨트롤러를 생성하고 초기화
         let signUpVC = SignUpViewController(viewModel: SignUpViewModel())
         signUpVC.modalPresentationStyle = .fullScreen
@@ -311,3 +320,18 @@ extension ViewController: UITextFieldDelegate {
         return true
     }
 }
+
+// MARK: - 전코드
+//        // 얼럿화면을 위한 뷰모델을 따로 만드는 것도 가능
+//        let alert = UIAlertController(title: "Sign up", message: "가입하시겠습니다?", preferredStyle: .alert)
+//        let success = UIAlertAction(title: "확인", style: .default) { action in
+//            print("확인버튼이 눌렸습니다.")
+//        }
+//        let cancel = UIAlertAction(title: "취소", style: .cancel) { action in
+//            print("취소버튼이 눌렸습니다.")
+//        }
+//        alert.addAction(success)
+//        alert.addAction(cancel)
+//
+//        self.present(alert, animated: true, completion: nil)
+

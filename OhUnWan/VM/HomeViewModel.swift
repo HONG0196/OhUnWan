@@ -9,7 +9,7 @@ import Foundation
 
 class HomeViewModel {
     
-    // 데이터 (모델) ⭐️⭐️⭐️
+    // 데이터 (모델)
     private var userEmail: String
     
     // Output
