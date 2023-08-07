@@ -65,12 +65,18 @@ class LoginViewModel {
 
     // 화면이동
     func goToNextScreen(from currentVC: UIViewController) {
-        let HomeVM = HomeViewModel(userEmail: self.emailString)
-        let nextVC = HomeViewController(viewModel: HomeVM)
-        nextVC.modalPresentationStyle = .fullScreen
-        
-        currentVC.present(nextVC, animated: true)
+        let tabBarController = TabBarController()
+        tabBarController.modalPresentationStyle = .fullScreen
+        currentVC.present(tabBarController, animated: true)
     }
+    
+    //    func goToNextScreen(from currentVC: UIViewController) {
+    //        let HomeVM = HomeViewModel(userEmail: self.emailString)
+    //        let nextVC = HomeViewController(viewModel: HomeVM)
+    //        nextVC.modalPresentationStyle = .fullScreen
+    //
+    //        currentVC.present(nextVC, animated: true)
+    //    }
     
 }
 

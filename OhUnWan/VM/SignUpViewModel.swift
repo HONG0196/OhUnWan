@@ -22,36 +22,36 @@ class SignUpViewModel {
     // 회원가입 상태 데이터 (public으로 변경)
     private(set) var signUpStatus: SignUpStatus = .none
     
-
+    
     
     // 실제 회원가입 요청 메서드
-       func signUp(with name: String, email: String, password: String, completion: @escaping (Bool) -> Void) {
-           guard isValidName(name),
-                 isValidEmail(email),
-                 isValidPassword(password) else {
-               signUpStatus = .validationFailed
-               completion(false)
-               return
-           }
-           
-           // Firebase 사용자 생성
-           Auth.auth().createUser(withEmail: email, password: password) { [unowned self] authResult, error in
-               if let error = error {
-                   signUpStatus = .signUpFailed
-                   print("Error signing up: \(error.localizedDescription)")
-                   completion(false)
-                   return
-               }
-               
-               // 사용자 생성 성공
-               signUpStatus = .signUpSuccess
-               // 여기서 사용자 이름 등 추가 정보를 Firebase에 저장
-               
-               completion(true)
-           }
-       }
+    func signUp(with name: String, email: String, password: String, completion: @escaping (Bool) -> Void) {
+        guard isValidName(name),
+              isValidEmail(email),
+              isValidPassword(password) else {
+            signUpStatus = .validationFailed
+            completion(false)
+            return
+        }
+        
+        // Firebase 사용자 생성
+        Auth.auth().createUser(withEmail: email, password: password) { [unowned self] authResult, error in
+            if let error = error {
+                signUpStatus = .signUpFailed
+                print("Error signing up: \(error.localizedDescription)")
+                completion(false)
+                return
+            }
+            
+            // 사용자 생성 성공
+            signUpStatus = .signUpSuccess
+            // 여기서 사용자 이름 등 추가 정보를 Firebase에 저장
+            
+            completion(true)
+        }
+    }
     
-
+    
     // 이름 유효성 검사
     private func isValidName(_ name: String) -> Bool {
         // 영어 또는 한글로만 구성되어 있으며 최소 1자 이상

@@ -57,7 +57,7 @@ class HomeViewController: UIViewController {
 
     private func loadData() {
         // 데이터를 가져오는 로직 (예시로 고정된 데이터 사용)
-        data = ["Apple", "Banana", "Cherry", "Date", "Grapes"]
+        data = ["1", "2", "3", "4", "5"]
         tableView.reloadData() // 테이블 뷰 데이터 리로드
     }
 }
@@ -88,9 +88,17 @@ extension HomeViewController: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 
 extension HomeViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("Selected item: \(data[indexPath.row])")
-    }
+        func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+            let selectedName = data[indexPath.row]
+            let selectedImage = UIImage(named: "image.png")
+            
+            let profileDetailVC = DetailViewController()
+            profileDetailVC.profileImage = selectedImage
+            profileDetailVC.name = selectedName
+            profileDetailVC.descriptionText = "Text View."
+            
+            navigationController?.pushViewController(profileDetailVC, animated: true)
+        }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 400
     }
