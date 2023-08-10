@@ -8,12 +8,12 @@
 import UIKit
 
 class HomeViewController: UIViewController {
-
+    
     private let tableView = UITableView()
     private var data: [String] = [] // 데이터 배열
-
+    
     let viewModel: HomeViewModel
-
+    
     // 코드로 구현할 때 뷰컨 생성자 ⭐️⭐️⭐️
     init(viewModel: HomeViewModel) {
         self.viewModel = viewModel
@@ -22,16 +22,35 @@ class HomeViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         setupTableView()
         loadData() // 데이터를 로드하는 메서드 호출
+        
+        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonTapped))
+        navigationItem.rightBarButtonItem = addButton
     }
-
+    
+    // MARK: - BarButton
+    
+    @objc private func addButtonTapped() {
+        // 바 버튼을 눌렀을 때 수행할 동작을 여기에 추가
+        // 예를 들어, 새 데이터를 추가하는 등의 작업
+        let newImage = UIImage(named: "new_image.png")
+        let newName = "New Name"
+        
+        let profileDetailVC = DetailViewController()
+        profileDetailVC.profileImage = newImage
+        profileDetailVC.name = newName
+        profileDetailVC.descriptionText = "New Text View."
+        
+        navigationController?.pushViewController(profileDetailVC, animated: true)
+    }
+    
     // MARK: - UI
-
+    
     private func setupTableView() {
         tableView.frame = view.bounds
         tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -40,21 +59,21 @@ class HomeViewController: UIViewController {
         tableView.delegate = self
         view.addSubview(tableView)
     }
-
+    
     // 뷰모델에서 데이터 가져다가 표시 ⭐️⭐️⭐️
     private func configureUI() {
         //self.basicLabel.text = viewModel.userEmailString
     }
-
+    
     // MARK: - 오토레이아웃
-
+    
     private func setupAutoLayout() {
-
-
+        
+        
     }
-
+    
     // MARK: - 데이터 처리
-
+    
     private func loadData() {
         // 데이터를 가져오는 로직 (예시로 고정된 데이터 사용)
         data = ["1", "2", "3", "4", "5"]
@@ -65,15 +84,15 @@ class HomeViewController: UIViewController {
 // MARK: - UITableViewDataSource
 
 extension HomeViewController: UITableViewDataSource {
-//    func numberOfSections(in tableView: UITableView) -> Int {
-//        return 1
-//    }
-
+    //    func numberOfSections(in tableView: UITableView) -> Int {
+    //        return 1
+    //    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return data.count
         //viewModel.userList.count
     }
-
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "UserPhotoCell", for: indexPath) as! UserPhotoCell
         
@@ -88,17 +107,17 @@ extension HomeViewController: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 
 extension HomeViewController: UITableViewDelegate {
-        func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-            let selectedName = data[indexPath.row]
-            let selectedImage = UIImage(named: "image.png")
-            
-            let profileDetailVC = DetailViewController()
-            profileDetailVC.profileImage = selectedImage
-            profileDetailVC.name = selectedName
-            profileDetailVC.descriptionText = "Text View."
-            
-            navigationController?.pushViewController(profileDetailVC, animated: true)
-        }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let selectedName = data[indexPath.row]
+        let selectedImage = UIImage(named: "image.png")
+        
+        let profileDetailVC = DetailViewController()
+        profileDetailVC.profileImage = selectedImage
+        profileDetailVC.name = selectedName
+        profileDetailVC.descriptionText = "Text View."
+        
+        navigationController?.pushViewController(profileDetailVC, animated: true)
+    }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 400
     }
