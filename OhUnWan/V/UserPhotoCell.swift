@@ -84,20 +84,21 @@ class UserPhotoCell: UITableViewCell {
     // MARK: - Configuration
 
     // 셀에 데이터를 설정하여 UI를 업데이트하는 메서드
-    func configure(with userImage: UIImage?, name: String, largeImage: UIImage?) {
-        // 작은 유저 이미지 설정
-        userImageView.image = userImage ?? UIImage(named: "image.png")
-        nameLabel.text = name // 이름 설정
-        // 큰 이미지 설정
-                if let largeImage = largeImage {
-                    largeImageView.image = largeImage
-                    largeImageView.contentMode = .scaleAspectFill
-                    largeImageView.clipsToBounds = true
-                } else {
-                    largeImageView.image = UIImage(named: "image.png")
-                    largeImageView.contentMode = .scaleAspectFill
-                    largeImageView.clipsToBounds = true
+    func configure(with profileImage: UIImage?, name: String, mainImageURL: URL?, largeImageURL: URL?, descriptionText: String) {
+  //cell.configure(with: image, name: post.text, mainImageURL: post.imageURL, largeImageURL: nil, descriptionText: "")
+        self.userImageView.image = profileImage
+        self.nameLabel.text = name
+        
+        if let mainImageURL = mainImageURL {
+            DispatchQueue.global().async { [weak self] in
+                if let data = try? Data(contentsOf: mainImageURL),
+                   let image = UIImage(data: data) {
+                    DispatchQueue.main.async {
+                        self?.largeImageView.image = image
+                    }
                 }
+            }
+        }
     }
 }
 

@@ -6,6 +6,9 @@
 //
 
 import Foundation
+import Firebase
+import FirebaseStorage
+import FirebaseDatabase
 
 enum NetworkError: Error {
     case badRequest
@@ -14,79 +17,106 @@ enum NetworkError: Error {
 }
 
 final class APIService {
-    
     static let shared = APIService()
-    
     private init() {}
     
-//
+    private let storageRef = Storage.storage().reference()
+    private let databaseRef = Database.database().reference()
     
-
-    // 실제 API형태
-    func login(username: String, password: String, completion: @escaping (Result<Void, NetworkError>) -> Void) {
-        
-        let url = URL(string: "...")!
-        
-        let loginData = ["username": username, "password": password]
-        
-        // 리퀘스트 생성 (포스트)
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try? JSONEncoder().encode(loginData)
-        
-        // with 리퀘스트 ===> URLSession
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            guard let data = data, error == nil,
-                  (response as? HTTPURLResponse)?.statusCode == 200 else {
-                      completion(.failure(.badRequest))
-                      return
-                  }
-            
-            guard let loginResponse = try? JSONDecoder().decode(LoginResponse.self, from: data) else {
-                completion(.failure(.decodingError))
-                return
+    // CREATE: 이미지와 텍스트를 저장하는 메서드
+    func createPost(image: UIImage, text: String, completion: @escaping (Error?) -> Void) {
+        // 이미지 업로드
+        uploadImage(image) { [weak self] result in
+            switch result {
+            case .success(let imageURL):
+                // 텍스트 데이터를 Realtime Database에 저장
+                self?.saveTextToDatabase(text, imageURL: imageURL, completion: completion)
+            case .failure(let error):
+                completion(error)
             }
-            
-            if loginResponse.success {
-                completion(.success(()))
-                return
-            } else {
-                completion(.failure(.notAuthenticated))
-                return
-            }
-        }.resume()
+        }
     }
     
-    func signUp(username: String, password: String, completion: @escaping (Result<Void, NetworkError>) -> Void) {
-        // 실제 서버와의 통신 로직을 구현해야 합니다.
-        // 서버로부터 받은 결과를 completion 핸들러를 통해 전달합니다.
+    // 이미지를 Storage에 업로드하고, 이미지 URL을 반환하는 메서드
+    private func uploadImage(_ image: UIImage, completion: @escaping (Result<URL, Error>) -> Void) {
+        // 이미지 데이터를 JPEG 형식으로 변환
+        guard let imageData = image.jpegData(compressionQuality: 0.5) else {
+            completion(.failure(NSError(domain: "com.yourapp", code: -1, userInfo: nil)))
+            return
+        }
+        
+        let imageName = UUID().uuidString
+        let imageRef = storageRef.child("images/\(imageName).jpg")
+        
+        let metadata = StorageMetadata()
+        metadata.contentType = "image/jpeg"
+        
+        // 이미지를 Storage에 업로드
+        imageRef.putData(imageData, metadata: metadata) { metadata, error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                // 이미지 다운로드 URL을 가져옴
+                imageRef.downloadURL { url, error in
+                    if let url = url {
+                        completion(.success(url))
+                    } else {
+                        completion(.failure(NSError(domain: "com.yourapp", code: -1, userInfo: nil)))
+                    }
+                }
+            }
+        }
+    }
+    
+    // 텍스트 데이터를 Realtime Database에 저장하는 메서드
+    private func saveTextToDatabase(_ text: String, imageURL: URL, completion: @escaping (Error?) -> Void) {
+        let data: [String: Any] = ["text": text, "imageURL": imageURL.absoluteString]
+        databaseRef.child("posts").childByAutoId().setValue(data) { error, _ in
+            completion(error)
+        }
+    }
+    
+    // READ: Realtime Database에서 데이터 가져오는 메서드
+    func fetchPosts(completion: @escaping ([Post], Error?) -> Void) {
+        databaseRef.child("posts").observeSingleEvent(of: .value) { snapshot in
+            var fetchedPosts: [Post] = []
+            
+            for childSnapshot in snapshot.children {
+                if let childSnapshot = childSnapshot as? DataSnapshot,
+                   let postDict = childSnapshot.value as? [String: Any],
+                   let text = postDict["text"] as? String,
+                   let imageURLString = postDict["imageURL"] as? String,
+                   let imageURL = URL(string: imageURLString) {
+                    
+                    let post = Post(text: text, imageURL: imageURL)
+                    fetchedPosts.append(post)
+                }
+            }
+            
+            completion(fetchedPosts, nil)
+        }
+    }
+    
+    // UPDATE: Realtime Database에서 데이터 수정하는 메서드
+    func updatePost(postID: String, newText: String, completion: @escaping (Error?) -> Void) {
+        let updatedData: [String: Any] = ["text": newText]
+        databaseRef.child("posts").child(postID).updateChildValues(updatedData) { error, _ in
+            completion(error)
+        }
+    }
+    
+    // DELETE: Realtime Database 및 Storage에서 데이터 삭제하는 메서드
+    func deletePost(postID: String, imageURL: URL, completion: @escaping (Error?) -> Void) {
+        // Storage에서 이미지 삭제
+        storageRef.child("images").child(imageURL.lastPathComponent).delete { error in
+            if let error = error {
+                completion(error)
+            } else {
+                // Storage에서 삭제 성공한 경우, Realtime Database에서 데이터 삭제
+                self.databaseRef.child("posts").child(postID).removeValue { error, _ in
+                    completion(error)
+                }
+            }
+        }
     }
 }
-
-// MARK: - 테스트코드
-
-//    func signUpTest(username: String, password: String, completion: @escaping (Result<Void, NetworkError>) -> Void) {
-//        // 실제 서버와의 통신이 아니라 테스트 메서드이므로, 더미 데이터를 이용하여 회원가입 성공/실패를 판단
-//        // 더미 데이터: 유효한 이메일과 비밀번호를 입력하면 회원가입 성공, 그 외의 경우에는 실패로 간주
-//        let validEmail = "test@gmail.com"
-//        let validPassword = "1234"
-//
-//        if username == validEmail && password == validPassword {
-//            completion(.success(())) // 회원가입 성공
-//        } else {
-//            completion(.failure(.notAuthenticated)) // 회원가입 실패
-//        }
-//    }
-
-// 테스트 형태
-//    func loginTest(username: String, password: String, completion: @escaping (Result<Void, NetworkError>) -> Void) {
-//
-//        if username == "1@gmail.com" && password == "1" {
-//            completion(.success(()))
-//            return
-//        } else {
-//            completion(.failure(.notAuthenticated))
-//            return
-//        }
-//    }

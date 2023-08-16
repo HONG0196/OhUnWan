@@ -10,11 +10,11 @@ import UIKit
 class HomeViewController: UIViewController {
     
     private let tableView = UITableView()
-    private var data: [String] = [] // 데이터 배열
     
+    // viewModel 생성
     let viewModel: HomeViewModel
     
-    // 코드로 구현할 때 뷰컨 생성자 ⭐️⭐️⭐️
+    // 뷰컨 생성자
     init(viewModel: HomeViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -27,7 +27,11 @@ class HomeViewController: UIViewController {
         super.viewDidLoad()
         
         setupTableView()
-        loadData() // 데이터를 로드하는 메서드 호출
+        
+        // Firebase에서 데이터를 가져와 표시
+        viewModel.fetchPosts { [weak self] in
+            self?.tableView.reloadData()
+        }
         
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonTapped))
         navigationItem.rightBarButtonItem = addButton
@@ -37,16 +41,13 @@ class HomeViewController: UIViewController {
     
     @objc private func addButtonTapped() {
         // 바 버튼을 눌렀을 때 수행할 동작을 여기에 추가
-        // 예를 들어, 새 데이터를 추가하는 등의 작업
-        let newImage = UIImage(named: "new_image.png")
-        let newName = "New Name"
+        // 이미지 선택을 위한 이미지 피커 뷰 컨트롤러 생성
+        let imagePickerController = UIImagePickerController()
+        imagePickerController.delegate = self
+        imagePickerController.sourceType = .photoLibrary
         
-        let profileDetailVC = DetailViewController()
-        profileDetailVC.profileImage = newImage
-        profileDetailVC.name = newName
-        profileDetailVC.descriptionText = "New Text View."
-        
-        navigationController?.pushViewController(profileDetailVC, animated: true)
+        // 이미지 선택 후에는 DetailViewController로 이동
+        present(imagePickerController, animated: true, completion: nil)
     }
     
     // MARK: - UI
@@ -74,31 +75,29 @@ class HomeViewController: UIViewController {
     
     // MARK: - 데이터 처리
     
-    private func loadData() {
-        // 데이터를 가져오는 로직 (예시로 고정된 데이터 사용)
-        data = ["1", "2", "3", "4", "5"]
-        tableView.reloadData() // 테이블 뷰 데이터 리로드
-    }
+
 }
 
 // MARK: - UITableViewDataSource
 
 extension HomeViewController: UITableViewDataSource {
-    //    func numberOfSections(in tableView: UITableView) -> Int {
-    //        return 1
-    //    }
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return data.count
-        //viewModel.userList.count
+        return viewModel.posts.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "UserPhotoCell", for: indexPath) as! UserPhotoCell
         
-        // 데이터를 가져와서 셀에 설정
-        let name = data[indexPath.row] // 이름
-        cell.configure(with: UIImage(named: "image.png"), name: name, largeImage: UIImage(named: "image.png"))
+        let post = viewModel.posts[indexPath.row]
+        
+        DispatchQueue.global().async { [weak self] in
+            if let data = try? Data(contentsOf: post.imageURL),
+               let image = UIImage(data: data) {
+                DispatchQueue.main.async {
+                    cell.configure(with: image, name: post.text, mainImageURL: post.imageURL, largeImageURL: nil, descriptionText: "")
+                }
+            }
+        }
         
         return cell
     }
@@ -108,17 +107,38 @@ extension HomeViewController: UITableViewDataSource {
 
 extension HomeViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedName = data[indexPath.row]
-        let selectedImage = UIImage(named: "image.png")
+        let selectedPost = viewModel.posts[indexPath.row]
         
         let profileDetailVC = DetailViewController()
-        profileDetailVC.profileImage = selectedImage
-        profileDetailVC.name = selectedName
-        profileDetailVC.descriptionText = "Text View."
+        profileDetailVC.profileImage = UIImage(named: "image.png") // 프로필 이미지 설정
+        profileDetailVC.name = "UserName"
+        profileDetailVC.mainImageURL = selectedPost.imageURL // 이미지 URL 설정
+        profileDetailVC.descriptionText = selectedPost.text
         
         navigationController?.pushViewController(profileDetailVC, animated: true)
     }
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 400
+    }
+}
+
+extension HomeViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    // 이미지 선택이 완료된 경우 호출되는 메서드
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        if let selectedImage = info[.originalImage] as? UIImage {
+            let profileDetailVC = DetailViewController()
+            profileDetailVC.mainImage = selectedImage
+            profileDetailVC.descriptionText = "New Text View."
+            
+            navigationController?.pushViewController(profileDetailVC, animated: true)
+        }
+        
+        picker.dismiss(animated: true, completion: nil)
+    }
+    
+    // 이미지 선택이 취소된 경우 호출되는 메서드
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
     }
 }
