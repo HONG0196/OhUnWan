@@ -61,7 +61,7 @@ class HomeViewController: UIViewController {
         view.addSubview(tableView)
     }
     
-    // 뷰모델에서 데이터 가져다가 표시 ⭐️⭐️⭐️
+    // 뷰모델에서 데이터 가져다가 표시 
     private func configureUI() {
         //self.basicLabel.text = viewModel.userEmailString
     }
@@ -70,12 +70,8 @@ class HomeViewController: UIViewController {
     
     private func setupAutoLayout() {
         
-        
     }
     
-    // MARK: - 데이터 처리
-    
-
 }
 
 // MARK: - UITableViewDataSource
@@ -94,7 +90,9 @@ extension HomeViewController: UITableViewDataSource {
             if let data = try? Data(contentsOf: post.imageURL),
                let image = UIImage(data: data) {
                 DispatchQueue.main.async {
-                    cell.configure(with: image, name: post.text, mainImageURL: post.imageURL, largeImageURL: nil, descriptionText: "")
+                    cell.configure(with: nil, name: post.text, mainImageURL: post.imageURL, largeImageURL: nil, descriptionText: "")
+                    cell.largeImageView.image = image // 이미지 설정
+                    cell.userImageView.image = image
                 }
             }
         }

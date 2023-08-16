@@ -84,21 +84,42 @@ class UserPhotoCell: UITableViewCell {
     // MARK: - Configuration
 
     // 셀에 데이터를 설정하여 UI를 업데이트하는 메서드
-    func configure(with profileImage: UIImage?, name: String, mainImageURL: URL?, largeImageURL: URL?, descriptionText: String) {
-  //cell.configure(with: image, name: post.text, mainImageURL: post.imageURL, largeImageURL: nil, descriptionText: "")
-        self.userImageView.image = profileImage
-        self.nameLabel.text = name
-        
-        if let mainImageURL = mainImageURL {
-            DispatchQueue.global().async { [weak self] in
-                if let data = try? Data(contentsOf: mainImageURL),
-                   let image = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        self?.largeImageView.image = image
+    func configure(with profileImageURL: URL?, name: String, mainImageURL: URL?, largeImageURL: URL?, descriptionText: String) {
+        // 이미지 로딩 및 캐싱 설정
+        if let profileImageURL = profileImageURL {
+            if let cachedImage = ImageCacheManager.shared.image(forKey: profileImageURL.absoluteString) {
+                userImageView.image = cachedImage
+            } else {
+                DispatchQueue.global().async {
+                    if let data = try? Data(contentsOf: profileImageURL),
+                       let image = UIImage(data: data) {
+                        ImageCacheManager.shared.setImage(image, forKey: profileImageURL.absoluteString)
+                        DispatchQueue.main.async {
+                            self.userImageView.image = image
+                        }
                     }
                 }
             }
         }
+        
+        if let largeImageURL = largeImageURL {
+            if let cachedImage = ImageCacheManager.shared.image(forKey: largeImageURL.absoluteString) {
+                largeImageView.image = cachedImage
+            } else {
+                DispatchQueue.global().async {
+                    if let data = try? Data(contentsOf: largeImageURL),
+                       let image = UIImage(data: data) {
+                        ImageCacheManager.shared.setImage(image, forKey: largeImageURL.absoluteString)
+                        DispatchQueue.main.async {
+                            self.largeImageView.image = image
+                        }
+                    }
+                }
+            }
+        }
+        
+        nameLabel.text = name
+        
     }
 }
 
