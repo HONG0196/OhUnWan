@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class HomeViewController: UIViewController {
     
@@ -125,18 +126,20 @@ extension HomeViewController: UIImagePickerControllerDelegate, UINavigationContr
     // 이미지 선택이 완료된 경우 호출되는 메서드
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         if let selectedImage = info[.originalImage] as? UIImage {
+            // DetailViewController를 생성하고 선택한 이미지와 관련된 정보를 설정
             let profileDetailVC = DetailViewController()
             profileDetailVC.mainImage = selectedImage
             profileDetailVC.descriptionText = "New Text View."
             
+            // 사용자의 UID를 DetailViewController로 전달
+            if let uid = Auth.auth().currentUser?.uid {
+                profileDetailVC.uid = uid
+            }
+            
+            // DetailViewController로 이동
             navigationController?.pushViewController(profileDetailVC, animated: true)
         }
         
-        picker.dismiss(animated: true, completion: nil)
-    }
-    
-    // 이미지 선택이 취소된 경우 호출되는 메서드
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion: nil)
     }
 }

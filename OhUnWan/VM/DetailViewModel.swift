@@ -14,8 +14,8 @@ class DetailViewModel {
     private let apiService = APIService.shared
     
     // CREATE: 이미지와 텍스트를 저장하는 메서드
-    func saveImageAndText(image: UIImage, text: String, completion: @escaping (Error?) -> Void) {
-        apiService.createPost(image: image, text: text, completion: completion)
+    func createPost(image: UIImage, text: String, uid: String, completion: @escaping (Error?) -> Void) {
+        apiService.createPost(image: image, text: text, uid: uid, completion: completion)
     }
     
     // UPDATE: 텍스트 수정하는 메서드

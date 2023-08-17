@@ -24,23 +24,22 @@ final class APIService {
     private let databaseRef = Database.database().reference()
     
     // CREATE: 이미지와 텍스트를 저장하는 메서드
-    func createPost(image: UIImage, text: String, completion: @escaping (Error?) -> Void) {
+    func createPost(image: UIImage, text: String, uid: String, completion: @escaping (Error?) -> Void) {
         // 이미지 업로드
         uploadImage(image) { [weak self] result in
             switch result {
             case .success(let imageURL):
-                // 텍스트 데이터를 Realtime Database에 저장
-                self?.saveTextToDatabase(text, imageURL: imageURL, completion: completion)
+                // 텍스트 데이터와 UID를 Realtime Database에 저장
+                self?.saveTextAndUIDToDatabase(text, imageURL: imageURL, uid: uid, completion: completion)
             case .failure(let error):
                 completion(error)
             }
         }
     }
     
-    // 이미지를 Storage에 업로드하고, 이미지 URL을 반환하는 메서드
     private func uploadImage(_ image: UIImage, completion: @escaping (Result<URL, Error>) -> Void) {
-        // 이미지 데이터를 JPEG 형식으로 변환
-        guard let imageData = image.jpegData(compressionQuality: 0.5) else {
+        // 이미지 데이터를 JPEG 형식으로 변환하고 리사이징
+        guard let resizedImageData = image.resizedTo(maxWidth: 800)?.jpegData(compressionQuality: 0.5) else {
             completion(.failure(NSError(domain: "com.yourapp", code: -1, userInfo: nil)))
             return
         }
@@ -51,8 +50,8 @@ final class APIService {
         let metadata = StorageMetadata()
         metadata.contentType = "image/jpeg"
         
-        // 이미지를 Storage에 업로드
-        imageRef.putData(imageData, metadata: metadata) { metadata, error in
+        // 리사이징된 이미지를 Storage에 업로드
+        imageRef.putData(resizedImageData, metadata: metadata) { metadata, error in
             if let error = error {
                 completion(.failure(error))
             } else {
@@ -68,9 +67,9 @@ final class APIService {
         }
     }
     
-    // 텍스트 데이터를 Realtime Database에 저장하는 메서드
-    private func saveTextToDatabase(_ text: String, imageURL: URL, completion: @escaping (Error?) -> Void) {
-        let data: [String: Any] = ["text": text, "imageURL": imageURL.absoluteString]
+    // 텍스트 데이터와 UID를 Realtime Database에 저장하는 메서드
+    private func saveTextAndUIDToDatabase(_ text: String, imageURL: URL, uid: String, completion: @escaping (Error?) -> Void) {
+        let data: [String: Any] = ["text": text, "imageURL": imageURL.absoluteString, "uid": uid]
         databaseRef.child("posts").childByAutoId().setValue(data) { error, _ in
             completion(error)
         }
@@ -118,5 +117,16 @@ final class APIService {
                 }
             }
         }
+    }
+}
+extension UIImage {
+    func resizedTo(maxWidth: CGFloat) -> UIImage? {
+        let scale = maxWidth / self.size.width
+        let newHeight = self.size.height * scale
+        UIGraphicsBeginImageContext(CGSize(width: maxWidth, height: newHeight))
+        self.draw(in: CGRect(x: 0, y: 0, width: maxWidth, height: newHeight))
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return newImage
     }
 }

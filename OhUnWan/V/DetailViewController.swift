@@ -11,6 +11,14 @@ class DetailViewController: UIViewController {
     
     private let viewModel = DetailViewModel()
     
+    // 데이터를 받아올 변수들을 선언
+    var profileImage: UIImage?
+    var name: String?
+    var mainImage: UIImage?
+    var descriptionText: String?
+    var mainImageURL: URL?
+    var uid: String?
+    
     // UI 요소들을 선언
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -71,11 +79,6 @@ class DetailViewController: UIViewController {
         return button
     }()
     
-    // 데이터를 받아올 변수들을 선언
-    var profileImage: UIImage?
-    var name: String?
-    var mainImage: UIImage?
-    var descriptionText: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -143,59 +146,45 @@ class DetailViewController: UIViewController {
         mainImageView.image = mainImage
         descriptionTextView.text = descriptionText
     }
-    // viewDidLoad() 밖에서 mainImageURL을 설정하는 프로퍼티 추가
-        var mainImageURL: URL?
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         
-        override func viewWillAppear(_ animated: Bool) {
-            super.viewWillAppear(animated)
-            
-            // mainImageURL이 있다면 이미지를 로드하여 mainImageView에 표시
-            if let imageURL = mainImageURL {
-                DispatchQueue.global().async { [weak self] in
-                    if let data = try? Data(contentsOf: imageURL),
-                       let image = UIImage(data: data) {
-                        DispatchQueue.main.async {
-                            self?.mainImageView.image = image
-                        }
+        // mainImageURL이 있다면 이미지를 로드하여 mainImageView에 표시
+        if let imageURL = mainImageURL {
+            DispatchQueue.global().async { [weak self] in
+                if let data = try? Data(contentsOf: imageURL),
+                   let image = UIImage(data: data) {
+                    DispatchQueue.main.async {
+                        self?.mainImageView.image = image
                     }
                 }
             }
         }
+    }
     
     @objc private func saveButtonTapped() {
-        //버튼을 눌렀을 때 수행할 동작을 여기에 추가
-        
-        guard let descriptionText = descriptionTextView.text, !descriptionText.isEmpty else {
-            // 텍스트가 없을 경우에는 경고를 표시하거나 사용자에게 알려줄 수 있습니다.
-            print("Please enter a description text.")
+        guard let uid = uid else {
+            print("UID is missing.")
             return
         }
         
-        if let mainImage = mainImageView.image {
-            viewModel.saveImageAndText(image: mainImage, text: descriptionText) { [weak self] error in
-                if let error = error {
-                    // 에러 처리
-                    print("Error saving image and text:", error)
-                } else {
-                    // 성공적으로 저장한 경우 처리
-                    print("Image and text saved successfully!")
-                    
-                    self?.navigationController?.popViewController(animated: true)
-                }
-            }
-        } else {
-            // 이미지 없이 텍스트만 저장하는 경우 처리
-            viewModel.saveImageAndText(image: UIImage(), text: descriptionText) { [weak self] error in
-                if let error = error {
-                    // 에러 처리
-                    print("Error saving text:", error)
-                } else {
-                    // 성공적으로 저장한 경우 처리
-                    print("Text saved successfully!")
-                    
-                    self?.navigationController?.popViewController(animated: true)
-                }
+        // 게시물 생성에 필요한 데이터 설정
+        let postImage = mainImage ?? UIImage()
+        let postText = descriptionTextView.text ?? ""
+        
+        // 게시물 생성 메서드 호출
+        viewModel.createPost(image: postImage, text: postText, uid: uid) { [weak self] (error: Error?) in // 에러 타입 명시
+            if let error = error {
+                // 에러 처리
+                print("Error creating post:", error)
+            } else {
+                // 게시물 생성 성공한 경우 처리
+                print("Post created successfully!")
+                
+                self?.navigationController?.popViewController(animated: true)
             }
         }
     }
+
 }
