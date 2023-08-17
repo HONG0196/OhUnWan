@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A473C1C93AC1052A11920BF3 /* Pods_OhUnWan.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 487E8A191413DD4A9BB8A82C /* Pods_OhUnWan.framework */; };
 		F113DFE82A7A2FBC00E2F1CC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F113DFE72A7A2FBC00E2F1CC /* AppDelegate.swift */; };
 		F113DFEA2A7A2FBC00E2F1CC /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F113DFE92A7A2FBC00E2F1CC /* SceneDelegate.swift */; };
 		F113DFEC2A7A2FBC00E2F1CC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F113DFEB2A7A2FBC00E2F1CC /* ViewController.swift */; };
@@ -35,6 +36,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		207DAF2E46ADCF65F53CD8CA /* Pods-OhUnWan.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OhUnWan.release.xcconfig"; path = "Target Support Files/Pods-OhUnWan/Pods-OhUnWan.release.xcconfig"; sourceTree = "<group>"; };
+		487E8A191413DD4A9BB8A82C /* Pods_OhUnWan.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OhUnWan.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4966801ABC01329611D251F5 /* Pods-OhUnWan.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OhUnWan.debug.xcconfig"; path = "Target Support Files/Pods-OhUnWan/Pods-OhUnWan.debug.xcconfig"; sourceTree = "<group>"; };
 		F113DFE42A7A2FBC00E2F1CC /* OhUnWan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OhUnWan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F113DFE72A7A2FBC00E2F1CC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F113DFE92A7A2FBC00E2F1CC /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -69,17 +73,38 @@
 				F132F9A02A7E2A1C0076F84F /* FirebaseAnalytics in Frameworks */,
 				F132F9A82A7E2A1C0076F84F /* FirebaseStorage in Frameworks */,
 				F132F9A22A7E2A1C0076F84F /* FirebaseAuth in Frameworks */,
+				A473C1C93AC1052A11920BF3 /* Pods_OhUnWan.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		260ADD14C4757FBD3F04C697 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				4966801ABC01329611D251F5 /* Pods-OhUnWan.debug.xcconfig */,
+				207DAF2E46ADCF65F53CD8CA /* Pods-OhUnWan.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		65F57296AA643449C13BA30E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				487E8A191413DD4A9BB8A82C /* Pods_OhUnWan.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F113DFDB2A7A2FBC00E2F1CC = {
 			isa = PBXGroup;
 			children = (
 				F113DFE62A7A2FBC00E2F1CC /* OhUnWan */,
 				F113DFE52A7A2FBC00E2F1CC /* Products */,
+				260ADD14C4757FBD3F04C697 /* Pods */,
+				65F57296AA643449C13BA30E /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -158,9 +183,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F113DFF82A7A2FBD00E2F1CC /* Build configuration list for PBXNativeTarget "OhUnWan" */;
 			buildPhases = (
+				648EABF08A05B81FDB82784F /* [CP] Check Pods Manifest.lock */,
 				F113DFE02A7A2FBC00E2F1CC /* Sources */,
 				F113DFE12A7A2FBC00E2F1CC /* Frameworks */,
 				F113DFE22A7A2FBC00E2F1CC /* Resources */,
+				D07F3E2A993D5D6A05FA4FD0 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -228,6 +255,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		648EABF08A05B81FDB82784F /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-OhUnWan-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D07F3E2A993D5D6A05FA4FD0 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-OhUnWan/Pods-OhUnWan-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-OhUnWan/Pods-OhUnWan-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-OhUnWan/Pods-OhUnWan-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		F113DFE02A7A2FBC00E2F1CC /* Sources */ = {
@@ -390,6 +459,7 @@
 		};
 		F113DFF92A7A2FBD00E2F1CC /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4966801ABC01329611D251F5 /* Pods-OhUnWan.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -418,6 +488,7 @@
 		};
 		F113DFFA2A7A2FBD00E2F1CC /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 207DAF2E46ADCF65F53CD8CA /* Pods-OhUnWan.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

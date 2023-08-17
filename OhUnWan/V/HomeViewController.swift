@@ -87,13 +87,16 @@ extension HomeViewController: UITableViewDataSource {
         
         let post = viewModel.posts[indexPath.row]
         
-        DispatchQueue.global().async { [weak self] in
+        DispatchQueue.global().async {
+            // 포스트의 이미지 URL로부터 데이터를 가져와 이미지를 생성
             if let data = try? Data(contentsOf: post.imageURL),
                let image = UIImage(data: data) {
+                // 메인 스레드에서 UI 업데이트를 수행
                 DispatchQueue.main.async {
+                    // UserPhotoCell 클래스의 configure 메서드를 호출하여 셀 UI를 설정
                     cell.configure(with: nil, name: post.text, mainImageURL: post.imageURL, largeImageURL: nil, descriptionText: "")
-                    cell.largeImageView.image = image // 이미지 설정
-                    cell.userImageView.image = image
+                    cell.largeImageView.image = image // 대표 이미지 설정
+                    cell.userImageView.image = image // 작은 유저 이미지 설정
                 }
             }
         }
