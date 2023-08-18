@@ -13,9 +13,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
     
+    func showLoginScreen() {
+        if let tabBarController = self.window?.rootViewController as? TabBarController {
+            // 로그인 화면을 표시하고 첫 번째 탭으로 변경
+            tabBarController.selectedIndex = 0
+            tabBarController.presentingViewController?.dismiss(animated: true, completion: nil)
+        }
+    }
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         FirebaseApp.configure()
+        
+        showLoginScreen()
         return true
     }
     

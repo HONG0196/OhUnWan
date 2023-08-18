@@ -117,6 +117,9 @@ extension HomeViewController: UITableViewDelegate {
         profileDetailVC.mainImageURL = selectedPost.imageURL // 이미지 URL 설정
         profileDetailVC.descriptionText = selectedPost.text
         
+        // 탭바 가리기
+        profileDetailVC.hidesBottomBarWhenPushed = true
+        
         navigationController?.pushViewController(profileDetailVC, animated: true)
     }
     
@@ -138,6 +141,9 @@ extension HomeViewController: UIImagePickerControllerDelegate, UINavigationContr
             if let uid = Auth.auth().currentUser?.uid {
                 profileDetailVC.uid = uid
             }
+            
+            // 탭바 가리기
+            profileDetailVC.hidesBottomBarWhenPushed = true
             
             // DetailViewController로 이동
             navigationController?.pushViewController(profileDetailVC, animated: true)

@@ -29,6 +29,8 @@
 		F132F9A42A7E2A1C0076F84F /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = F132F9A32A7E2A1C0076F84F /* FirebaseDatabase */; };
 		F132F9A62A7E2A1C0076F84F /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = F132F9A52A7E2A1C0076F84F /* FirebaseFirestore */; };
 		F132F9A82A7E2A1C0076F84F /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = F132F9A72A7E2A1C0076F84F /* FirebaseStorage */; };
+		F14784982A8F471C00FF1CD8 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14784972A8F471C00FF1CD8 /* ProfileViewController.swift */; };
+		F147849A2A8F49DA00FF1CD8 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14784992A8F49DA00FF1CD8 /* ProfileViewModel.swift */; };
 		F19B33012A8C997800A7767E /* DetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19B33002A8C997800A7767E /* DetailViewModel.swift */; };
 		F19B33032A8CC3CA00A7767E /* ImageCasheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19B33022A8CC3CA00A7767E /* ImageCasheManager.swift */; };
 		F1D887742A80CA63001138EA /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D887732A80CA63001138EA /* TabBarController.swift */; };
@@ -57,6 +59,8 @@
 		F113E00F2A7CA8E300E2F1CC /* SignUpViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewModel.swift; sourceTree = "<group>"; };
 		F113E0112A7CEA8400E2F1CC /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		F132F99C2A7E26A50076F84F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		F14784972A8F471C00FF1CD8 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		F14784992A8F49DA00FF1CD8 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		F19B33002A8C997800A7767E /* DetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewModel.swift; sourceTree = "<group>"; };
 		F19B33022A8CC3CA00A7767E /* ImageCasheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCasheManager.swift; sourceTree = "<group>"; };
 		F1D887732A80CA63001138EA /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
@@ -86,7 +90,6 @@
 				4966801ABC01329611D251F5 /* Pods-OhUnWan.debug.xcconfig */,
 				207DAF2E46ADCF65F53CD8CA /* Pods-OhUnWan.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -149,6 +152,7 @@
 				F113E00D2A7CA7C200E2F1CC /* SignUpViewController.swift */,
 				F113E0012A7A372B00E2F1CC /* HomeViewController.swift */,
 				F1D887752A80CF04001138EA /* DetailViewController.swift */,
+				F14784972A8F471C00FF1CD8 /* ProfileViewController.swift */,
 				F113E0092A7A3E2300E2F1CC /* UserPhotoCell.swift */,
 				F113E00A2A7A3E2300E2F1CC /* UserPhotoCell.xib */,
 				F113DFED2A7A2FBC00E2F1CC /* Main.storyboard */,
@@ -164,6 +168,7 @@
 				F113E0112A7CEA8400E2F1CC /* HomeViewModel.swift */,
 				F113E00F2A7CA8E300E2F1CC /* SignUpViewModel.swift */,
 				F19B33002A8C997800A7767E /* DetailViewModel.swift */,
+				F14784992A8F49DA00FF1CD8 /* ProfileViewModel.swift */,
 			);
 			path = VM;
 			sourceTree = "<group>";
@@ -310,11 +315,13 @@
 				F113E00B2A7A3E2300E2F1CC /* UserPhotoCell.swift in Sources */,
 				F113E00E2A7CA7C200E2F1CC /* SignUpViewController.swift in Sources */,
 				F113DFEC2A7A2FBC00E2F1CC /* ViewController.swift in Sources */,
+				F14784982A8F471C00FF1CD8 /* ProfileViewController.swift in Sources */,
 				F113DFE82A7A2FBC00E2F1CC /* AppDelegate.swift in Sources */,
 				F19B33032A8CC3CA00A7767E /* ImageCasheManager.swift in Sources */,
 				F113DFEA2A7A2FBC00E2F1CC /* SceneDelegate.swift in Sources */,
 				F19B33012A8C997800A7767E /* DetailViewModel.swift in Sources */,
 				F113E0082A7A3ADB00E2F1CC /* LoginResponse.swift in Sources */,
+				F147849A2A8F49DA00FF1CD8 /* ProfileViewModel.swift in Sources */,
 				F1D887742A80CA63001138EA /* TabBarController.swift in Sources */,
 				F113E0102A7CA8E300E2F1CC /* SignUpViewModel.swift in Sources */,
 				F113E0062A7A3A6300E2F1CC /* Networking.swift in Sources */,

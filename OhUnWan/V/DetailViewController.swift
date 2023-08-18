@@ -82,7 +82,9 @@ class DetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupUI()
+        
     }
     
     // UI를 설정
@@ -188,3 +190,4 @@ class DetailViewController: UIViewController {
     }
 
 }
+
