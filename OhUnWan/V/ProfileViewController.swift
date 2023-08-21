@@ -8,26 +8,33 @@
 import UIKit
 import FirebaseAuth
 import SDWebImage
+import FirebaseStorage
 
 class ProfileViewController: UIViewController {
     
-    // MARK: - UI Elements
+    var isEditingProfile = false
+    
+    // ViewModel 인스턴스 생성
+    let profileViewModel = ProfileViewModel()
+    
+    // MARK: - UI 요소
     
     let profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = 50 // 프로필 사진을 원형으로 만들기 위한 코너 반지름 설정
+        imageView.layer.cornerRadius = 50
         imageView.layer.masksToBounds = true
         return imageView
     }()
     
-    let nameLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.boldSystemFont(ofSize: 20)
-        label.textAlignment = .center
-        return label
+    let nameTextField: UITextField = {
+        let textField = UITextField()
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.font = UIFont.boldSystemFont(ofSize: 20)
+        textField.textAlignment = .center
+        textField.borderStyle = .roundedRect
+        return textField
     }()
     
     let emailLabel: UILabel = {
@@ -47,7 +54,19 @@ class ProfileViewController: UIViewController {
         return button
     }()
     
-    // MARK: - View Lifecycle
+    lazy var editButton: UIBarButtonItem = {
+        let button = UIBarButtonItem(title: "수정", style: .plain, target: self, action: #selector(editButtonTapped))
+        return button
+    }()
+    
+    lazy var saveButton: UIBarButtonItem = {
+        let button = UIBarButtonItem(title: "저장", style: .done, target: self, action: #selector(saveButtonTapped))
+        return button
+    }()
+    
+    
+    
+    // MARK: - 뷰 라이프사이클
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,15 +74,25 @@ class ProfileViewController: UIViewController {
         view.backgroundColor = .white
         setupUI()
         loadUserData()
+        navigationItem.rightBarButtonItem = editButton
+        
+        // 처음에는 텍스트 필드를 편집할 수 없도록 설정
+        nameTextField.isEnabled = false
+        
+        // profileImageView를 탭하는 제스처 인식기
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
+        profileImageView.addGestureRecognizer(tapGestureRecognizer)
     }
     
-    // MARK: - UI Setup
+    // MARK: - UI 설정
     
     private func setupUI() {
         view.addSubview(profileImageView)
-        view.addSubview(nameLabel)
+        view.addSubview(nameTextField)
         view.addSubview(emailLabel)
         view.addSubview(logoutButton)
+        
+        profileImageView.isUserInteractionEnabled = true
         
         NSLayoutConstraint.activate([
             profileImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -71,30 +100,94 @@ class ProfileViewController: UIViewController {
             profileImageView.widthAnchor.constraint(equalToConstant: 100),
             profileImageView.heightAnchor.constraint(equalToConstant: 100),
             
-            nameLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            nameLabel.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 20),
+            nameTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            nameTextField.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 20),
+            nameTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 40),
+            nameTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
             
             emailLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            emailLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 10),
+            emailLabel.topAnchor.constraint(equalTo: nameTextField.bottomAnchor, constant: 10),
             
             logoutButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             logoutButton.topAnchor.constraint(equalTo: emailLabel.bottomAnchor, constant: 30)
         ])
     }
     
-    // MARK: - Load User Data
+    // MARK: - 사용자 정보 로드
     
     private func loadUserData() {
-        if let currentUser = Auth.auth().currentUser {
-            nameLabel.text = currentUser.displayName
-            emailLabel.text = currentUser.email
-            if let profileImageURL = currentUser.photoURL {
-                profileImageView.sd_setImage(with: profileImageURL)
+        profileViewModel.getCurrentUser { result in
+            switch result {
+            case .success(let currentUser):
+                DispatchQueue.main.async {
+                    self.nameTextField.text = currentUser?.displayName
+                    self.emailLabel.text = currentUser?.email
+                    if let profileImageURL = currentUser?.photoURL {
+                        self.profileImageView.sd_setImage(with: profileImageURL)
+                    }
+                }
+            case .failure(let error):
+                print("사용자 정보 로딩 오류:", error.localizedDescription)
             }
         }
     }
     
-    // MARK: - Logout Button Action
+    @objc private func editButtonTapped() {
+        // 편집 모드를 토글하여 현재 편집 상태를 관리합니다.
+        isEditingProfile.toggle()
+        
+        if isEditingProfile {
+            // 편집 가능한 상태로 전환하고 저장 버튼을 나타냅니다.
+            nameTextField.isEnabled = true
+            navigationItem.rightBarButtonItem = saveButton
+            let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped))
+            profileImageView.addGestureRecognizer(tapGestureRecognizer)
+        } else {
+            // 편집 가능한 상태를 해제하고 수정 버튼을 나타냅니다.
+            nameTextField.isEnabled = false
+            navigationItem.rightBarButtonItem = editButton
+            profileImageView.gestureRecognizers?.forEach { recognizer in
+                profileImageView.removeGestureRecognizer(recognizer)
+            }
+        }
+    }
+    
+    @objc private func saveButtonTapped() {
+        nameTextField.isEnabled = false
+        
+        // profileImageView의 기존 제스처 인식기를 제거합니다.
+        profileImageView.gestureRecognizers?.forEach { recognizer in
+            profileImageView.removeGestureRecognizer(recognizer)
+        }
+        
+        let newName = nameTextField.text
+        
+        guard let newImage = profileImageView.image else {
+            print("프로필 이미지가 없습니다.")
+            return
+        }
+        
+        profileViewModel.uploadAndSaveUserProfile(newName: newName, newImage: newImage) { [weak self] result in
+            switch result {
+            case .success:
+                DispatchQueue.main.async {
+                    print("프로필 업데이트 성공")
+                    // 이름과 이미지가 모두 업데이트되었을 때에만 저장 버튼을 수정 버튼으로 변경
+                    self?.navigationItem.rightBarButtonItem = self?.editButton
+                }
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    print("프로필 업데이트 오류:", error.localizedDescription)
+                    // 업데이트 실패시에도 저장 버튼을 수정 버튼으로 변경
+                    self?.navigationItem.rightBarButtonItem = self?.editButton
+                }
+            }
+        }
+    }
+    
+    
+    
+    // MARK: - 로그아웃 버튼 동작
     
     @objc private func logoutButtonTapped() {
         do {
@@ -108,8 +201,30 @@ class ProfileViewController: UIViewController {
             }
             
         } catch {
-            print("로그아웃 에러:", error.localizedDescription)
+            print("로그아웃 오류:", error.localizedDescription)
         }
     }
 }
 
+extension ProfileViewController: UIImagePickerControllerDelegate & UINavigationControllerDelegate {
+    @objc private func profileImageViewTapped() {
+            if isEditingProfile {
+                let imagePicker = UIImagePickerController()
+                imagePicker.delegate = self
+                imagePicker.sourceType = .photoLibrary
+                present(imagePicker, animated: true, completion: nil)
+            }
+        }
+    
+    // Image picker delegate methods
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            profileImageView.image = selectedImage
+        }
+        picker.dismiss(animated: true, completion: nil)
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
+    }
+}
