@@ -85,9 +85,10 @@ final class APIService {
                    let postDict = childSnapshot.value as? [String: Any],
                    let text = postDict["text"] as? String,
                    let imageURLString = postDict["imageURL"] as? String,
+                   let uid = postDict["uid"] as? String,
                    let imageURL = URL(string: imageURLString) {
                     
-                    let post = Post(text: text, imageURL: imageURL)
+                    let post = Post(text: text, imageURL: imageURL, uid: uid) // uid 정보도 저장
                     fetchedPosts.append(post)
                 }
             }
@@ -95,6 +96,7 @@ final class APIService {
             completion(fetchedPosts, nil)
         }
     }
+
     
     // UPDATE: Realtime Database에서 데이터 수정하는 메서드
     func updatePost(postID: String, newText: String, completion: @escaping (Error?) -> Void) {

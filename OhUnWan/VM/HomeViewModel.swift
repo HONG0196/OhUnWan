@@ -28,9 +28,10 @@ class HomeViewModel {
                    let postDict = childSnapshot.value as? [String: Any],
                    let text = postDict["text"] as? String,
                    let imageURLString = postDict["imageURL"] as? String,
+                   let uid = postDict["uid"] as? String,
                    let imageURL = URL(string: imageURLString) {
                     
-                    let post = Post(text: text, imageURL: imageURL)
+                    let post = Post(text: text, imageURL: imageURL, uid: uid)
                     fetchedPosts.append(post)
                 }
             }
@@ -42,11 +43,13 @@ class HomeViewModel {
             }
         }
     }
+    
 }
     
     struct Post {
         let text: String
         let imageURL: URL
+        let uid: String
     }
     
     

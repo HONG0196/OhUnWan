@@ -8,11 +8,13 @@
 import FirebaseAuth
 import FirebaseStorage
 import UIKit
+import FirebaseDatabase
 
 class AuthService {
     // Singleton으로 생성되는 AuthService 클래스
     static let shared = AuthService()
     private init() {}
+    private let databaseRef = Database.database().reference()
     
     // 사용자 등록 및 프로필 이미지 업로드와 업데이트
     func signUp(email: String, password: String, displayName: String, profileImage: UIImage?, completion: @escaping (Result<User, Error>) -> Void) {
@@ -70,6 +72,28 @@ class AuthService {
                         }
                     }
                 }
+            }
+        }
+    }
+    
+    // 이름 가져오기
+    func getUserDisplayName(completion: @escaping (Result<String?, Error>) -> Void) {
+        if let user = Auth.auth().currentUser {
+            completion(.success(user.displayName))
+        } else {
+            completion(.success(nil))
+        }
+    }
+    
+    // 프로필 이미지 가져오기
+    func getUserProfileImageURL(uid: String, completion: @escaping (Result<URL?, Error>) -> Void) {
+        let storageRef = Storage.storage().reference().child("profileImages").child("\(uid).jpg")
+        
+        storageRef.downloadURL { url, error in
+            if let downloadURL = url {
+                completion(.success(downloadURL))
+            } else if let error = error {
+                completion(.failure(error))
             }
         }
     }
