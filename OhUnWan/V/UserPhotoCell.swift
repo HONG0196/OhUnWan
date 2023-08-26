@@ -93,10 +93,10 @@ class UserPhotoCell: UITableViewCell {
     // MARK: - Configuration
     
     // 셀에 데이터를 설정하여 UI를 업데이트하는 메서드
-    func configure(with profileImageURL: URL?, name: String, mainImageURL: URL?, largeImageURL: URL?, descriptionText: String) {
+    func configure(with profileImageURL: URL?, displayName: String, largeImageURL: URL?) {
         // 이미지를 초기화하여 새 데이터가 로딩될 때 이전 이미지가 남아있는 문제를 방지
         userImageView.image = nil
-        nameLabel.text = name
+        nameLabel.text = displayName
         largeImageView.image = nil
         
         // 프로필 이미지 설정

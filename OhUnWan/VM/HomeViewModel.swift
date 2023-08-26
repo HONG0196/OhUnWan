@@ -12,48 +12,59 @@ import FirebaseDatabase
 class HomeViewModel {
     
     private var databaseRef: DatabaseReference
-    var posts: [Post] = []
+    var posts: [Post] = [] // 게시물 데이터를 저장할 배열
+    var users: [User] = [] // 사용자 데이터를 저장할 배열
     
     init() {
         databaseRef = Database.database().reference()
     }
     
-    // Firebase에서 데이터 가져오는 메서드
-    func fetchPosts(completion: @escaping () -> Void) {
-        databaseRef.child("posts").observe(.value) { [weak self] snapshot in
-            var fetchedPosts: [Post] = []
-            
-            for childSnapshot in snapshot.children {
-                if let childSnapshot = childSnapshot as? DataSnapshot,
-                   let postDict = childSnapshot.value as? [String: Any],
-                   let text = postDict["text"] as? String,
-                   let imageURLString = postDict["imageURL"] as? String,
-                   let uid = postDict["uid"] as? String,
-                   let imageURL = URL(string: imageURLString) {
-                    
-                    let post = Post(text: text, imageURL: imageURL, uid: uid)
-                    fetchedPosts.append(post)
-                }
-            }
-            
-            // 메인 스레드에서 포스트 배열 업데이트
-            DispatchQueue.main.async {
+    // 게시물과 사용자 데이터 가져오기
+    func fetchData(completion: @escaping (Error?) -> Void) {
+        let group = DispatchGroup()
+        var fetchError: Error?
+        
+        // 게시물 데이터 가져오기
+        group.enter()
+        APIService.shared.fetchPosts { [weak self] fetchedPosts, error in
+            if let error = error {
+                fetchError = error
+            } else {
                 self?.posts = fetchedPosts
-                completion() // 완료 핸들러 호출
             }
+            group.leave()
+        }
+        
+        // 사용자 데이터 가져오기
+        group.enter()
+        AuthService.shared.fetchUsers { [weak self] fetchedUsers, error in
+            if let error = error {
+                fetchError = error
+            } else {
+                self?.users = fetchedUsers
+            }
+            group.leave()
+        }
+        
+        // 모든 데이터가 가져와진 후 호출될 클로저
+        group.notify(queue: .main) {
+            completion(fetchError)
+            self.updateUIWithFetchedData() // 모든 데이터를 가져온 후에 업데이트
         }
     }
     
-}
-    
-    struct Post {
-        let text: String
-        let imageURL: URL
-        let uid: String
+    // 데이터를 업데이트하고 UI를 업데이트하는 메서드
+    func updateUIWithFetchedData() {
+        // 테이블 뷰 업데이트 로직
+        NotificationCenter.default.post(name: Notification.Name("DataUpdatedNotification"), object: nil)
     }
     
-    
-    
-    
-    
-    
+    // 특정 게시물에 대한 사용자 정보 가져오기
+    func userForPost(at index: Int) -> User? {
+        let post = posts[index]
+        if let user = users.first(where: { $0.uid == post.uid }) {
+            return user
+        }
+        return nil
+    }
+}

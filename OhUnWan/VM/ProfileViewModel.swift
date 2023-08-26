@@ -14,68 +14,65 @@ import SDWebImage
 class ProfileViewModel {
     private let authService: AuthService
     
+    // 사용자 정보를 저장할 프로퍼티
+    var user: User?
+    
     // AuthService의 인스턴스를 주입받아 초기화
     init(authService: AuthService = AuthService.shared) {
         self.authService = authService
     }
     
-    // 현재 로그인한 사용자 정보 가져오기
-    func getCurrentUser(completion: @escaping (Result<User?, Error>) -> Void) {
-        if let currentUser = Auth.auth().currentUser {
-            completion(.success(currentUser))
-        } else {
-            completion(.failure(ProfileError.userNotFound))
+    // 사용자 프로필 업로드
+        func uploadUserProfile(displayName: String, profileImage: UIImage, completion: @escaping (Error?) -> Void) {
+            guard let uid = user?.uid else {
+                completion(NSError(domain: "com.yourapp", code: -1, userInfo: nil))
+                return
+            }
+            
+            authService.uploadProfileImage(image: profileImage, uid: uid) { [weak self] result in
+                switch result {
+                case .success(let profileImageURL):
+                    self?.updateUserProfile(displayName: displayName, profileImageURL: profileImageURL, completion: completion)
+                case .failure(let error):
+                    completion(error)
+                }
+            }
         }
-    }
     
-    // 사용자 프로필 업데이트하기
-    func updateUserProfile(newName: String?, newImageURL: URL?, completion: @escaping (Result<Void, Error>) -> Void) {
-        guard let currentUser = Auth.auth().currentUser else {
-            completion(.failure(ProfileError.userNotFound))
+    // 사용자 프로필 업데이트
+    func updateUserProfile(displayName: String, profileImageURL: URL, completion: @escaping (Error?) -> Void) {
+        guard let uid = user?.uid else {
+            completion(NSError(domain: "com.yourapp", code: -1, userInfo: nil))
             return
         }
         
-        // AuthService의 메서드를 사용하여 사용자 프로필 업데이트하기
-        authService.updateUserProfile(uid: currentUser.uid, displayName: newName ?? currentUser.displayName ?? "", profileImageURL: newImageURL) { result in
-            completion(result)
-        }
-    }
-    
-    // 변경 사항을 서버에 반영하기 위한 메서드
-    private func commitChanges(changeRequest: UserProfileChangeRequest, completion: @escaping (Result<Void, Error>) -> Void) {
-        changeRequest.commitChanges { error in
+        authService.updateUserProfile(uid: uid, displayName: displayName, profileImageURL: profileImageURL) { error in
             if let error = error {
-                completion(.failure(error))
-            } else {
-                completion(.success(()))
+                print("Error updating user profile:", error)
             }
+            completion(error)
         }
     }
+    
+    // 사용자 정보 가져오기
+       func fetchUser(completion: @escaping (Bool) -> Void) {
+           let currentUserUID = authService.getCurrentUserUID()
+           
+           authService.fetchUsers { [weak self] users, error in
+               if let error = error {
+                   print("Error fetching users:", error)
+                   completion(false)
+                   return
+               }
+               
+               // Find the user you need using appropriate criteria
+               if let currentUser = users.first(where: { $0.uid == currentUserUID }) {
+                   self?.user = currentUser
+                   completion(true)
+               } else {
+                   completion(false)
+               }
+           }
+       }
 }
 
-enum ProfileError: Error {
-    case userNotFound
-}
-
-// ProfileViewModel에 추가된 메서드
-extension ProfileViewModel {
-    // 사용자 프로필 업데이트와 이미지 업로드를 처리하는 메서드
-    func uploadAndSaveUserProfile(newName: String?, newImage: UIImage, completion: @escaping (Result<Void, Error>) -> Void) {
-        guard let currentUser = Auth.auth().currentUser else {
-            // 현재 사용자 정보를 찾지 못한 경우 실패 결과 반환
-            completion(.failure(ProfileError.userNotFound))
-            return
-        }
-        
-        // 이미지 업로드
-        authService.uploadProfileImage(image: newImage, uid: currentUser.uid) { [weak self] result in
-            switch result {
-            case .success(let imageURL):
-                // 사용자 프로필 업데이트
-                self?.updateUserProfile(newName: newName, newImageURL: imageURL, completion: completion)
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
-}

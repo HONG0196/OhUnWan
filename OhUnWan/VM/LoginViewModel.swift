@@ -70,44 +70,5 @@ class LoginViewModel {
         currentVC.present(tabBarController, animated: true)
     }
     
-    //    func goToNextScreen(from currentVC: UIViewController) {
-    //        let HomeVM = HomeViewModel(userEmail: self.emailString)
-    //        let nextVC = HomeViewController(viewModel: HomeVM)
-    //        nextVC.modalPresentationStyle = .fullScreen
-    //
-    //        currentVC.present(nextVC, animated: true)
-    //    }
-    
 }
 
-// MARK: - 전 코드
-
-//    func handleUserLogin(fromCurrentVC: UIViewController, animated: Bool) {
-//        guard !emailString.isEmpty && !passwordString.isEmpty else {
-//            self.loginStatus = .validationFailed
-//            return
-//        }
-//
-//        APIService.shared.loginTest(username: emailString, password: passwordString) { [unowned self] result in
-//            switch result {
-//            case .success():
-//                // 로그인 데이터 상태 변경
-//                self.loginStatus = .authenticated
-//                self.goToNextVC(fromCurrentVC: fromCurrentVC, animated: true)
-//                print("로그인 성공")
-//            case .failure(_):
-//                // 로그인 데이터 상태 변경
-//                self.loginStatus = .loginDenied
-//                print("로그인 실패")
-//            }
-//        }
-//    }
-// Logic
-// 화면 이동을 뷰모델에서 처리
-//  func goToNextVC(fromCurrentVC: UIViewController, animated: Bool) {
-//        let HomeVM = HomeViewModel(userEmail: self.emailString)
-//        let nextVC = HomeViewController(viewModel: HomeVM)
-//        nextVC.modalPresentationStyle = .fullScreen
-//
-//        fromCurrentVC.present(nextVC, animated: true)
-//    }

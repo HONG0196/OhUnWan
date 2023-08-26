@@ -23,14 +23,14 @@ final class APIService {
     private let storageRef = Storage.storage().reference()
     private let databaseRef = Database.database().reference()
     
-    // CREATE: 이미지와 텍스트를 저장하는 메서드
+    // CREATE: 글 저장
     func createPost(image: UIImage, text: String, uid: String, completion: @escaping (Error?) -> Void) {
         // 이미지 업로드
         uploadImage(image) { [weak self] result in
             switch result {
             case .success(let imageURL):
-                // 텍스트 데이터와 UID를 Realtime Database에 저장
-                self?.saveTextAndUIDToDatabase(text, imageURL: imageURL, uid: uid, completion: completion)
+                // 텍스트 데이터와 이미지 URL, UID를 Realtime Database에 저장
+                self?.savePostToDatabase(text: text, imageURL: imageURL, uid: uid, completion: completion)
             case .failure(let error):
                 completion(error)
             }
@@ -67,10 +67,16 @@ final class APIService {
         }
     }
     
-    // 텍스트 데이터와 UID를 Realtime Database에 저장하는 메서드
-    private func saveTextAndUIDToDatabase(_ text: String, imageURL: URL, uid: String, completion: @escaping (Error?) -> Void) {
-        let data: [String: Any] = ["text": text, "imageURL": imageURL.absoluteString, "uid": uid]
-        databaseRef.child("posts").childByAutoId().setValue(data) { error, _ in
+    private func savePostToDatabase(text: String, imageURL: URL, uid: String, completion: @escaping (Error?) -> Void) {
+        let newPostRef = databaseRef.child("posts").childByAutoId()
+        let post: [String: Any] = [
+            "text": text,
+            "imageURL": imageURL.absoluteString,
+            "uid": uid,
+            "timestamp": ServerValue.timestamp() // 현재 시간을 타임스탬프로 저장
+        ]
+        
+        newPostRef.setValue(post) { error, _ in
             completion(error)
         }
     }
@@ -86,17 +92,18 @@ final class APIService {
                    let text = postDict["text"] as? String,
                    let imageURLString = postDict["imageURL"] as? String,
                    let uid = postDict["uid"] as? String,
-                   let imageURL = URL(string: imageURLString) {
+                   let timestamp = postDict["timestamp"] as? TimeInterval {
                     
-                    let post = Post(text: text, imageURL: imageURL, uid: uid) // uid 정보도 저장
-                    fetchedPosts.append(post)
+                    if let imageURL = URL(string: imageURLString) {
+                        let post = Post(text: text, imageURL: imageURL, uid: uid, timestamp: timestamp)
+                        fetchedPosts.append(post)
+                    }
                 }
             }
             
             completion(fetchedPosts, nil)
         }
     }
-
     
     // UPDATE: Realtime Database에서 데이터 수정하는 메서드
     func updatePost(postID: String, newText: String, completion: @escaping (Error?) -> Void) {
@@ -121,6 +128,7 @@ final class APIService {
         }
     }
 }
+// 리사이징
 extension UIImage {
     func resizedTo(maxWidth: CGFloat) -> UIImage? {
         let scale = maxWidth / self.size.width
@@ -130,5 +138,19 @@ extension UIImage {
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return newImage
+    }
+}
+// 이미지 다운로드를 처리
+extension APIService {
+    func downloadImage(from url: URL, completion: @escaping (Result<UIImage, Error>) -> Void) {
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+            } else if let data = data, let image = UIImage(data: data) {
+                completion(.success(image))
+            } else {
+                completion(.failure(NetworkError.decodingError))
+            }
+        }.resume()
     }
 }

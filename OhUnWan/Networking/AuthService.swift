@@ -16,121 +16,119 @@ class AuthService {
     private init() {}
     private let databaseRef = Database.database().reference()
     
-    // 사용자 등록 및 프로필 이미지 업로드와 업데이트
-    func signUp(email: String, password: String, displayName: String, profileImage: UIImage?, completion: @escaping (Result<User, Error>) -> Void) {
-        Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
-            if let error = error {
-                completion(.failure(error))
-            } else if let user = authResult?.user {
-                // 사용자가 이미지를 제공했다면 프로필 이미지를 업로드
-                if let profileImage = profileImage {
-                    self.uploadProfileImage(image: profileImage, uid: user.uid) { result in
-                        switch result {
-                        case .success(let imageURL):
-                            // 사용자의 프로필 업데이트
-                            self.updateUserProfile(uid: user.uid, displayName: displayName, profileImageURL: imageURL) { result in
-                                switch result {
-                                case .success:
-                                    completion(.success(user))
-                                case .failure(let error):
-                                    completion(.failure(error))
-                                }
-                            }
-                        case .failure(let error):
-                            completion(.failure(error))
-                        }
-                    }
-                } else {
-                    // 사용자의 프로필 업데이트
-                    self.updateUserProfile(uid: user.uid, displayName: displayName, profileImageURL: nil) { result in
-                        switch result {
-                        case .success:
-                            completion(.success(user))
-                        case .failure(let error):
-                            completion(.failure(error))
-                        }
-                    }
-                }
-            }
-        }
-    }
     
-    // 프로필 이미지를 Firebase Storage에 업로드
-    func uploadProfileImage(image: UIImage, uid: String, completion: @escaping (Result<URL, Error>) -> Void) {
-        let storageRef = Storage.storage().reference().child("profileImages").child("\(uid).jpg")
-        if let imageData = image.jpegData(compressionQuality: 0.5) {
-            storageRef.putData(imageData, metadata: nil) { metadata, error in
-                if let error = error {
-                    completion(.failure(error))
-                } else {
-                    // 이미지 업로드 성공 시 다운로드 URL을 받아서 반환
-                    storageRef.downloadURL { url, error in
-                        if let downloadURL = url {
-                            completion(.success(downloadURL))
-                        } else if let error = error {
-                            completion(.failure(error))
-                        }
-                    }
-                }
-            }
-        }
+    func getCurrentUserUID() -> String? {
+        let currentUser = Auth.auth().currentUser
+        let uid = currentUser?.uid
+        print("Current user UID:", uid)
+        return uid
     }
-    
-    // 이름 가져오기
-    func getUserDisplayName(completion: @escaping (Result<String?, Error>) -> Void) {
-        if let user = Auth.auth().currentUser {
-            completion(.success(user.displayName))
-        } else {
-            completion(.success(nil))
-        }
-    }
-    
-    // 프로필 이미지 가져오기
-    func getUserProfileImageURL(uid: String, completion: @escaping (Result<URL?, Error>) -> Void) {
-        let storageRef = Storage.storage().reference().child("profileImages").child("\(uid).jpg")
-        
-        storageRef.downloadURL { url, error in
-            if let downloadURL = url {
-                completion(.success(downloadURL))
-            } else if let error = error {
-                completion(.failure(error))
-            }
-        }
-    }
-    
-    // 사용자 프로필 업데이트
-    func updateUserProfile(uid: String, displayName: String, profileImageURL: URL?, completion: @escaping (Result<Void, Error>) -> Void) {
-        var changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
-        changeRequest?.displayName = displayName
-        if let profileImageURL = profileImageURL {
-            changeRequest?.photoURL = profileImageURL
-        }
 
-        changeRequest?.commitChanges { error in
+    // MARK: - 프로필 이미지 업로드
+    func uploadProfileImage(image: UIImage, uid: String, completion: @escaping (Result<URL, Error>) -> Void) {
+        guard let resizedImageData = image.resizedTo(maxWidth: 800)?.jpegData(compressionQuality: 0.5) else {
+            completion(.failure(NSError(domain: "com.yourapp", code: -1, userInfo: nil)))
+            return
+        }
+        
+        let imageName = "\(uid)_profile.jpg"
+        let imageRef = Storage.storage().reference().child("profile_images/\(imageName)")
+        
+        let metadata = StorageMetadata()
+        metadata.contentType = "image/jpeg"
+        
+        imageRef.putData(resizedImageData, metadata: metadata) { metadata, error in
             if let error = error {
                 completion(.failure(error))
             } else {
-                completion(.success(()))
-            }
-        }
-    }
-
-    // 사용자 프로필 정보 업데이트 및 이미지 업로드 함수 호출
-    func updateProfileInfo(uid: String, displayName: String, profileImage: UIImage?, completion: @escaping (Result<Void, Error>) -> Void) {
-        if let image = profileImage {
-            // 프로필 이미지 업로드 후 사용자 프로필 업데이트
-            AuthService.shared.uploadProfileImage(image: image, uid: uid) { result in
-                switch result {
-                case .success(let imageURL):
-                    self.updateUserProfile(uid: uid, displayName: displayName, profileImageURL: imageURL, completion: completion)
-                case .failure(let error):
-                    completion(.failure(error))
+                imageRef.downloadURL { url, error in
+                    if let url = url {
+                        completion(.success(url))
+                    } else {
+                        completion(.failure(NSError(domain: "com.yourapp", code: -1, userInfo: nil)))
+                    }
                 }
             }
-        } else {
-            // 이미지가 없을 경우 프로필 정보만 업데이트
-            self.updateUserProfile(uid: uid, displayName: displayName, profileImageURL: nil, completion: completion)
         }
     }
     
+    // MARK: - 사용자 이름 가져오기
+    func getUserDisplayName(uid: String, completion: @escaping (String?, Error?) -> Void) {
+        databaseRef.child("users").child(uid).observeSingleEvent(of: .value) { snapshot in
+            if let userData = snapshot.value as? [String: Any],
+               let displayName = userData["displayName"] as? String {
+                completion(displayName, nil)
+            } else {
+                completion(nil, NSError(domain: "com.yourapp", code: -1, userInfo: nil))
+            }
+        }
+    }
+    
+    // MARK: - 프로필 이미지 가져오기
+    func getUserProfileImageURL(uid: String, completion: @escaping (URL?, Error?) -> Void) {
+        databaseRef.child("users").child(uid).observeSingleEvent(of: .value) { snapshot in
+            if let userData = snapshot.value as? [String: Any],
+               let profileImageURLString = userData["profileImageURL"] as? String,
+               let profileImageURL = URL(string: profileImageURLString) {
+                completion(profileImageURL, nil)
+            } else {
+                completion(nil, NSError(domain: "com.yourapp", code: -1, userInfo: nil))
+            }
+        }
+    }
+    
+    // MARK: - 사용자 프로필 업데이트
+    func updateUserProfile(uid: String, displayName: String, profileImageURL: URL, completion: @escaping (Error?) -> Void) {
+        let userRef = databaseRef.child("users").child(uid)
+        let userData: [String: Any] = [
+            "displayName": displayName,
+            "profileImageURL": profileImageURL.absoluteString
+            // ... 다른 사용자 정보 필드도 추가
+        ]
+        
+        userRef.updateChildValues(userData) { error, _ in
+            completion(error)
+        }
+    }
+    
+    // MARK: - 이메일 가져오기
+    func getUserEmail(completion: @escaping (String?) -> Void) {
+        if let currentUser = Auth.auth().currentUser {
+            let email = currentUser.email
+            completion(email)
+        } else {
+            completion(nil)
+        }
+    }
+
+    
+    // MARK: - 사용자 데이터 가져오기
+    func fetchUsers(completion: @escaping ([User], Error?) -> Void) {
+        databaseRef.child("users").observeSingleEvent(of: .value) { snapshot in
+            guard let usersData = snapshot.value as? [String: [String: Any]] else {
+                completion([], NSError(domain: "com.yourapp", code: -1, userInfo: nil))
+                return
+            }
+            print("Fetched usersData:", usersData) // 추가: 데이터 확인용 출력
+            var users: [User] = []
+            for (uid, userData) in usersData {
+                if let displayName = userData["displayName"] as? String,
+                   let email = userData["email"] as? String,
+                   let profileImageURLString = userData["profileImageURL"] as? String,
+                   let profileImageURL = URL(string: profileImageURLString) {
+                    let user = User(uid: uid, displayName: displayName, email: email, profileImageURL: profileImageURL.absoluteString)
+                    
+                    users.append(user)
+                }
+            }
+
+            // 추가: users 배열에 저장된 사용자 정보 출력
+            print("Fetched users:", users)
+
+            completion(users, nil)
+        }
+    }
+
+
+
 }

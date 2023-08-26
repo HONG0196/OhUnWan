@@ -116,18 +116,15 @@ class ProfileViewController: UIViewController {
     // MARK: - 사용자 정보 로드
     
     private func loadUserData() {
-        profileViewModel.getCurrentUser { result in
-            switch result {
-            case .success(let currentUser):
+        // 사용자 정보 가져와서 UI 업데이트
+        profileViewModel.fetchUser { [weak self] success in
+            if success {
+                // 사용자 정보 가져오기 성공한 경우에만 UI 업데이트
                 DispatchQueue.main.async {
-                    self.nameTextField.text = currentUser?.displayName
-                    self.emailLabel.text = currentUser?.email
-                    if let profileImageURL = currentUser?.photoURL {
-                        self.profileImageView.sd_setImage(with: profileImageURL)
-                    }
+                    self?.updateUIWithUserData()
                 }
-            case .failure(let error):
-                print("사용자 정보 로딩 오류:", error.localizedDescription)
+            } else {
+                print("사용자 정보 가져오기 실패")
             }
         }
     }
@@ -167,24 +164,30 @@ class ProfileViewController: UIViewController {
             return
         }
         
-        profileViewModel.uploadAndSaveUserProfile(newName: newName, newImage: newImage) { [weak self] result in
-            switch result {
-            case .success:
-                DispatchQueue.main.async {
-                    print("프로필 업데이트 성공")
-                    // 이름과 이미지가 모두 업데이트되었을 때에만 저장 버튼을 수정 버튼으로 변경
-                    self?.navigationItem.rightBarButtonItem = self?.editButton
+        // 프로필 업로드
+        profileViewModel.uploadUserProfile(displayName: newName ?? "", profileImage: newImage) { [weak self] error in
+            if let error = error {
+                print("프로필 업로드 오류:", error)
+            } else {
+                print("프로필 업로드 완료")
+            }
+            self?.navigationItem.rightBarButtonItem = self?.editButton
+        }
+    }
+    // 사용자 정보로 UI 업데이트
+    private func updateUIWithUserData() {
+        DispatchQueue.main.async { [weak self] in
+            if let user = self?.profileViewModel.user {
+                self?.nameTextField.text = user.displayName
+                self?.emailLabel.text = user.email
+                if let profileImageURL = URL(string: user.profileImageURL) {
+                    self?.profileImageView.sd_setImage(with: profileImageURL, completed: nil)
                 }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    print("프로필 업데이트 오류:", error.localizedDescription)
-                    // 업데이트 실패시에도 저장 버튼을 수정 버튼으로 변경
-                    self?.navigationItem.rightBarButtonItem = self?.editButton
-                }
+            } else {
+                print("사용자 정보 없음")
             }
         }
     }
-    
     
     
     // MARK: - 로그아웃 버튼 동작

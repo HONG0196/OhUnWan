@@ -174,15 +174,5 @@ extension SignUpViewController {
         }
         return true
     }
-    
-    //    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-    //        // 비밀번호 필드와 비밀번호 확인 필드의 입력값이 일치하는지 확인합니다.
-    //        if textField == passwordTextField || textField == confirmPasswordTextField {
-    //            let updatedText = (textField.text as NSString?)?.replacingCharacters(in: range, with: string)
-    //            let password = passwordTextField.text ?? ""
-    //            let confirmPassword = confirmPasswordTextField.text ?? ""
-    //            //signUpButton.isEnabled = !password.isEmpty && password == confirmPassword
-    //        }
-    //        return true
-    //    }
+
 }

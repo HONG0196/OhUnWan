@@ -29,6 +29,8 @@
 		F132F9A42A7E2A1C0076F84F /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = F132F9A32A7E2A1C0076F84F /* FirebaseDatabase */; };
 		F132F9A62A7E2A1C0076F84F /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = F132F9A52A7E2A1C0076F84F /* FirebaseFirestore */; };
 		F132F9A82A7E2A1C0076F84F /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = F132F9A72A7E2A1C0076F84F /* FirebaseStorage */; };
+		F146AABA2A988BB5000B78B3 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F146AAB92A988BB5000B78B3 /* Comment.swift */; };
+		F146AABC2A988BE6000B78B3 /* Likes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F146AABB2A988BE6000B78B3 /* Likes.swift */; };
 		F14784982A8F471C00FF1CD8 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14784972A8F471C00FF1CD8 /* ProfileViewController.swift */; };
 		F147849A2A8F49DA00FF1CD8 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14784992A8F49DA00FF1CD8 /* ProfileViewModel.swift */; };
 		F147849C2A933BD900FF1CD8 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F147849B2A933BD900FF1CD8 /* AuthService.swift */; };
@@ -36,6 +38,8 @@
 		F19B33032A8CC3CA00A7767E /* ImageCasheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19B33022A8CC3CA00A7767E /* ImageCasheManager.swift */; };
 		F1D887742A80CA63001138EA /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D887732A80CA63001138EA /* TabBarController.swift */; };
 		F1D887762A80CF04001138EA /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D887752A80CF04001138EA /* DetailViewController.swift */; };
+		F1E92DBA2A962B210017C820 /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E92DB92A962B210017C820 /* Post.swift */; };
+		F1E92DBC2A962B5C0017C820 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E92DBB2A962B5C0017C820 /* User.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -60,6 +64,8 @@
 		F113E00F2A7CA8E300E2F1CC /* SignUpViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewModel.swift; sourceTree = "<group>"; };
 		F113E0112A7CEA8400E2F1CC /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		F132F99C2A7E26A50076F84F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		F146AAB92A988BB5000B78B3 /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
+		F146AABB2A988BE6000B78B3 /* Likes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Likes.swift; sourceTree = "<group>"; };
 		F14784972A8F471C00FF1CD8 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		F14784992A8F49DA00FF1CD8 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		F147849B2A933BD900FF1CD8 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
@@ -67,6 +73,8 @@
 		F19B33022A8CC3CA00A7767E /* ImageCasheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCasheManager.swift; sourceTree = "<group>"; };
 		F1D887732A80CA63001138EA /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		F1D887752A80CF04001138EA /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		F1E92DB92A962B210017C820 /* Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
+		F1E92DBB2A962B5C0017C820 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -143,6 +151,10 @@
 			children = (
 				F113E0072A7A3ADB00E2F1CC /* LoginResponse.swift */,
 				F19B33022A8CC3CA00A7767E /* ImageCasheManager.swift */,
+				F1E92DBB2A962B5C0017C820 /* User.swift */,
+				F1E92DB92A962B210017C820 /* Post.swift */,
+				F146AAB92A988BB5000B78B3 /* Comment.swift */,
+				F146AABB2A988BE6000B78B3 /* Likes.swift */,
 			);
 			path = M;
 			sourceTree = "<group>";
@@ -319,7 +331,10 @@
 				F113E00B2A7A3E2300E2F1CC /* UserPhotoCell.swift in Sources */,
 				F113E00E2A7CA7C200E2F1CC /* SignUpViewController.swift in Sources */,
 				F113DFEC2A7A2FBC00E2F1CC /* ViewController.swift in Sources */,
+				F146AABC2A988BE6000B78B3 /* Likes.swift in Sources */,
+				F1E92DBC2A962B5C0017C820 /* User.swift in Sources */,
 				F14784982A8F471C00FF1CD8 /* ProfileViewController.swift in Sources */,
+				F146AABA2A988BB5000B78B3 /* Comment.swift in Sources */,
 				F113DFE82A7A2FBC00E2F1CC /* AppDelegate.swift in Sources */,
 				F19B33032A8CC3CA00A7767E /* ImageCasheManager.swift in Sources */,
 				F113DFEA2A7A2FBC00E2F1CC /* SceneDelegate.swift in Sources */,
@@ -327,6 +342,7 @@
 				F113E0082A7A3ADB00E2F1CC /* LoginResponse.swift in Sources */,
 				F147849A2A8F49DA00FF1CD8 /* ProfileViewModel.swift in Sources */,
 				F1D887742A80CA63001138EA /* TabBarController.swift in Sources */,
+				F1E92DBA2A962B210017C820 /* Post.swift in Sources */,
 				F113E0102A7CA8E300E2F1CC /* SignUpViewModel.swift in Sources */,
 				F113E0062A7A3A6300E2F1CC /* APIService.swift in Sources */,
 			);
