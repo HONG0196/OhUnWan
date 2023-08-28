@@ -38,24 +38,24 @@ class HomeViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-            super.viewWillAppear(animated)
-            
-            // 데이터를 업데이트하고 화면을 새로고침
-            viewModel.fetchData { [weak self] error in
-                if let error = error {
-                    print("Error fetching data:", error)
-                } else {
-                    self?.dataUpdated()
-                }
+        super.viewWillAppear(animated)
+        
+        // 데이터를 업데이트하고 화면을 새로고침
+        viewModel.fetchData { [weak self] error in
+            if let error = error {
+                print("Error fetching data:", error)
+            } else {
+                self?.dataUpdated()
             }
         }
+    }
     
     // 데이터 업데이트 시 호출되는 메서드
-     private func dataUpdated() {
-         DispatchQueue.main.async {
-             self.tableView.reloadData() // 테이블 뷰 업데이트
-         }
-     }
+    private func dataUpdated() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData() // 테이블 뷰 업데이트
+        }
+    }
     
     // MARK: - BarButton
     
@@ -81,7 +81,7 @@ class HomeViewController: UIViewController {
         view.addSubview(tableView)
     }
     
-
+    
 }
 
 // MARK: - UITableViewDataSource
@@ -107,7 +107,15 @@ extension HomeViewController: UITableViewDataSource {
             )
         }
         
+        // 좋아요 버튼의 동작 설정
+        cell.likeButton.addTarget(self, action: #selector(likeButtonTapped(_:)), for: .touchUpInside)
+        
         return cell
+    }
+    
+    @objc private func likeButtonTapped(_ sender: UIButton) {
+        // 좋아요 버튼을 눌렀을 때 수행할 동작을 여기에 추가
+        // 예를 들어, 해당 셀의 인덱스를 가져와서 상태 변경 등의 로직을 구현
     }
 }
 

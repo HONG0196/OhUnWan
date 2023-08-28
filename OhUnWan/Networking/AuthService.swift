@@ -109,7 +109,7 @@ class AuthService {
                 completion([], NSError(domain: "com.yourapp", code: -1, userInfo: nil))
                 return
             }
-            print("Fetched usersData:", usersData) // 추가: 데이터 확인용 출력
+            //print("Fetched usersData:", usersData) // 추가: 데이터 확인용 출력
             var users: [User] = []
             for (uid, userData) in usersData {
                 if let displayName = userData["displayName"] as? String,
@@ -123,7 +123,7 @@ class AuthService {
             }
 
             // 추가: users 배열에 저장된 사용자 정보 출력
-            print("Fetched users:", users)
+            //print("Fetched users:", users)
 
             completion(users, nil)
         }
