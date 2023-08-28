@@ -129,6 +129,8 @@ class ProfileViewController: UIViewController {
         }
     }
     
+    // MARK: - Button
+
     @objc private func editButtonTapped() {
         // 편집 모드를 토글하여 현재 편집 상태를 관리합니다.
         isEditingProfile.toggle()
@@ -148,10 +150,11 @@ class ProfileViewController: UIViewController {
             }
         }
     }
+
     
     @objc private func saveButtonTapped() {
         nameTextField.isEnabled = false
-        
+        isEditingProfile.toggle()
         // profileImageView의 기존 제스처 인식기를 제거합니다.
         profileImageView.gestureRecognizers?.forEach { recognizer in
             profileImageView.removeGestureRecognizer(recognizer)
