@@ -12,25 +12,29 @@ struct Post: Codable {
     let imageURL: String
     let uid: String
     let timestamp: TimeInterval
+    let postID: String 
     
     enum CodingKeys: String, CodingKey {
         case text
         case imageURL
         case uid
         case timestamp
+        case postID
     }
     
-    init(text: String, imageURL: URL, uid: String, timestamp: TimeInterval) {
+    init(text: String, imageURL: URL, uid: String, timestamp: TimeInterval, postID: String) {
         self.text = text
-        self.imageURL = imageURL.absoluteString // 이미지 URL을 String으로 저장
+        self.imageURL = imageURL.absoluteString
         self.uid = uid
         self.timestamp = timestamp
+        self.postID = postID // postID 초기화
     }
     
     func formattedDate() -> String {
         let postDate = Date(timeIntervalSince1970: timestamp)
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss" // 원하는 날짜 및 시간 표시 형식 설정
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         return dateFormatter.string(from: postDate)
     }
 }
+

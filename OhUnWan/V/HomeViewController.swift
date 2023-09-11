@@ -155,11 +155,21 @@ extension HomeViewController: UITableViewDelegate {
         // 설명 텍스트 설정
         profileDetailVC.descriptionText = selectedPost.text
         
+        // postID 설정
+        profileDetailVC.postID = selectedPost.postID
+        
+        // 현재 사용자의 UID 설정
+        profileDetailVC.isCurrentUserPost = selectedPost.uid == Auth.auth().currentUser?.uid
+        
+        // 현재 사용자의 UID 설정
+        profileDetailVC.uid = Auth.auth().currentUser?.uid
+        
         // 탭바 가리기
         profileDetailVC.hidesBottomBarWhenPushed = true
         
         navigationController?.pushViewController(profileDetailVC, animated: true)
     }
+    
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 400

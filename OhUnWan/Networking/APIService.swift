@@ -29,8 +29,11 @@ final class APIService {
         uploadImage(image) { [weak self] result in
             switch result {
             case .success(let imageURL):
-                // 텍스트 데이터와 이미지 URL, UID를 Realtime Database에 저장
-                self?.savePostToDatabase(text: text, imageURL: imageURL, uid: uid, completion: completion)
+                // 포스트ID 생성
+                let postID = self?.databaseRef.child("posts").childByAutoId().key ?? ""
+                
+                // 텍스트 데이터와 이미지 URL, UID, 포스트ID를 Realtime Database에 저장
+                self?.savePostToDatabase(text: text, imageURL: imageURL, uid: uid, postID: postID, completion: completion)
             case .failure(let error):
                 completion(error)
             }
@@ -67,13 +70,14 @@ final class APIService {
         }
     }
     
-    private func savePostToDatabase(text: String, imageURL: URL, uid: String, completion: @escaping (Error?) -> Void) {
-        let newPostRef = databaseRef.child("posts").childByAutoId()
+    private func savePostToDatabase(text: String, imageURL: URL, uid: String, postID: String, completion: @escaping (Error?) -> Void) {
+        let newPostRef = databaseRef.child("posts").child(postID) // 포스트ID를 사용하여 참조 생성
         let post: [String: Any] = [
             "text": text,
             "imageURL": imageURL.absoluteString,
             "uid": uid,
-            "timestamp": ServerValue.timestamp() // 현재 시간을 타임스탬프로 저장
+            "timestamp": ServerValue.timestamp(),
+            "postID": postID 
         ]
         
         newPostRef.setValue(post) { error, _ in
@@ -92,10 +96,11 @@ final class APIService {
                    let text = postDict["text"] as? String,
                    let imageURLString = postDict["imageURL"] as? String,
                    let uid = postDict["uid"] as? String,
-                   let timestamp = postDict["timestamp"] as? TimeInterval {
+                   let timestamp = postDict["timestamp"] as? TimeInterval,
+                   let postID = postDict["postID"] as? String {
                     
                     if let imageURL = URL(string: imageURLString) {
-                        let post = Post(text: text, imageURL: imageURL, uid: uid, timestamp: timestamp)
+                        let post = Post(text: text, imageURL: imageURL, uid: uid, timestamp: timestamp, postID: postID)
                         fetchedPosts.append(post)
                     }
                 }

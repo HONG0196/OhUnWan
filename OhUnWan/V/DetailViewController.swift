@@ -6,10 +6,16 @@
 //
 
 import UIKit
+import FirebaseDatabase
 
 class DetailViewController: UIViewController {
     
     private let viewModel = DetailViewModel()
+    
+    var isCurrentUserPost: Bool = false // 현재 사용자가 게시물의 작성자인지 여부를 나타내는 프로퍼티
+    
+    // Firebase Realtime Database에 대한 레퍼런스를 선언
+    var postRef: DatabaseReference?
     
     // 데이터를 받아올 변수들을 선언
     var profileImage: UIImage?
@@ -18,6 +24,8 @@ class DetailViewController: UIViewController {
     var descriptionText: String?
     var mainImageURL: URL?
     var uid: String?
+    var postID: String?
+
     
     // UI 요소들을 선언
     private let scrollView: UIScrollView = {
@@ -84,6 +92,18 @@ class DetailViewController: UIViewController {
         super.viewDidLoad()
         
         setupUI()
+        
+        // Check if the current user is the author of the post
+        if isCurrentUserPost {
+            saveButton.setTitle("Update", for: .normal)
+        } else {
+            saveButton.setTitle("Save", for: .normal)
+        }
+        
+        // Firebase Realtime Database에 대한 레퍼런스 초기화
+        if let postID = postID {
+            postRef = Database.database().reference().child("posts").child(postID)
+        }
         
     }
     
@@ -175,19 +195,37 @@ class DetailViewController: UIViewController {
         let postImage = mainImage ?? UIImage()
         let postText = descriptionTextView.text ?? ""
         
-        // 게시물 생성 메서드 호출
-        viewModel.createPost(image: postImage, text: postText, uid: uid) { [weak self] (error: Error?) in // 에러 타입 명시
-            if let error = error {
-                // 에러 처리
-                print("Error creating post:", error)
-            } else {
-                // 게시물 생성 성공한 경우 처리
-                print("Post created successfully!")
-                
-                self?.navigationController?.popViewController(animated: true)
+        if isCurrentUserPost {
+            // 업데이트 기능
+            guard let postID = postID else {
+                print("Post ID is missing.")
+                return
+            }
+            
+            viewModel.updatePost(postID: postID, newText: postText) { [weak self] (error: Error?) in
+                if let error = error {
+                    // 에러 처리
+                    print("Error updating post:", error)
+                } else {
+                    // 게시물 업데이트 성공한 경우 처리
+                    print("Post updated successfully!")
+                    
+                    self?.navigationController?.popViewController(animated: true)
+                }
+            }
+        } else {
+            // 생성 기능
+            viewModel.createPost(image: postImage, text: postText, uid: uid) { [weak self] (error: Error?) in
+                if let error = error {
+                    // 에러 처리
+                    print("Error creating post:", error)
+                } else {
+                    // 게시물 생성 성공한 경우 처리
+                    print("Post created successfully!")
+                    
+                    self?.navigationController?.popViewController(animated: true)
+                }
             }
         }
     }
-
 }
-
