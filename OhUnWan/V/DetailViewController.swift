@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import FirebaseDatabase
 
 class DetailViewController: UIViewController {
     
@@ -14,8 +13,6 @@ class DetailViewController: UIViewController {
     
     var isCurrentUserPost: Bool = false // 현재 사용자가 게시물의 작성자인지 여부를 나타내는 프로퍼티
     
-    // Firebase Realtime Database에 대한 레퍼런스를 선언
-    var postRef: DatabaseReference?
     
     // 데이터를 받아올 변수들을 선언
     var profileImage: UIImage?
@@ -98,11 +95,6 @@ class DetailViewController: UIViewController {
             saveButton.setTitle("Update", for: .normal)
         } else {
             saveButton.setTitle("Save", for: .normal)
-        }
-        
-        // Firebase Realtime Database에 대한 레퍼런스 초기화
-        if let postID = postID {
-            postRef = Database.database().reference().child("posts").child(postID)
         }
         
     }
