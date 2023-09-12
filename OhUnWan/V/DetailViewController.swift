@@ -22,7 +22,7 @@ class DetailViewController: UIViewController {
     var mainImageURL: URL?
     var uid: String?
     var postID: String?
-
+    
     
     // UI 요소들을 선언
     private let scrollView: UIScrollView = {
@@ -93,6 +93,7 @@ class DetailViewController: UIViewController {
         // Check if the current user is the author of the post
         if isCurrentUserPost {
             saveButton.setTitle("Update", for: .normal)
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Delete", style: .plain, target: self, action: #selector(deleteButtonTapped))
         } else {
             saveButton.setTitle("Save", for: .normal)
         }
@@ -217,6 +218,26 @@ class DetailViewController: UIViewController {
                     
                     self?.navigationController?.popViewController(animated: true)
                 }
+            }
+        }
+    }
+    
+    @objc private func deleteButtonTapped() {
+        guard let postID = postID, let mainImageURL = mainImageURL else {
+            print("Post ID or mainImageURL is missing.")
+            return
+        }
+
+        viewModel.deletePost(postID: postID, imageURL: mainImageURL) { [weak self] (error: Error?) in
+            if let error = error {
+                // 에러 처리
+                print("Error deleting post:", error)
+            } else {
+                // 게시물 삭제 성공한 경우 처리
+                print("Post deleted successfully!")
+
+                // 게시물이 삭제되었으므로 이전 화면으로 돌아감
+                self?.navigationController?.popViewController(animated: true)
             }
         }
     }
