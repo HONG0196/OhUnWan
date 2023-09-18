@@ -7,11 +7,12 @@
 
 import UIKit
 import SDWebImage
+import FirebaseAuth
 
 class UserPhotoCell: UITableViewCell {
     
     // MARK: - Properties
-    
+    var post: Post?
     let heartImage = UIImage(named: "heart.png") // 이미지 이름에 맞게 수정
     let heartImageSize = CGSize(width: 40, height: 40) // 원하는 크기로 수정
     
@@ -112,21 +113,46 @@ class UserPhotoCell: UITableViewCell {
     
     // likeButtonTapped
     @objc private func likeButtonTapped() {
-        // 좋아요 버튼을 눌렀을 때 수행할 동작을 여기에 추가
-        // 예를 들어, 좋아요 상태 변경 등의 로직을 구현
+        print("likeButtonTapped called")
         
-        // 이미지를 토글하도록 구현 예시
-        if likeButton.currentImage == resizedHeartImage {
-            likeButton.setImage(UIImage(named: "fillheart.png"), for: .normal)
-        } else {
-            likeButton.setImage(resizedHeartImage, for: .normal)
+        // 현재 사용자의 UID를 가져오기
+        guard let currentUserUID = AuthService.shared.getCurrentUserUID() else {
+            // 사용자 UID를 가져올 수 없는 경우, 처리를 중단
+            print("Current user UID not found")
+            return
+        }
+        
+        if var post = self.post {
+            // 클라이언트 측의 토글 작업
+            post.likes.toggleLike(forPost: post, currentUserUID: currentUserUID) // 좋아요 토글
+            
+            // UI 업데이트 코드 (클라이언트 측)
+            if post.likes.usersLiked.contains(currentUserUID) {
+                self.likeButton.setImage(UIImage(named: "fillheart.png"), for: .normal)
+                print("Updated like status: Liked")
+            } else {
+                self.likeButton.setImage(self.resizedHeartImage, for: .normal)
+                print("Updated like status: Not liked")
+            }
+            
+            // 서버에 좋아요 상태 업데이트 요청
+            APIService.shared.updateLikeStatus(for: post.postID, currentUserUID: currentUserUID) { [weak self] error in
+                if let error = error {
+                    print("Error updating like status:", error)
+                } else {
+                    // 업데이트된 post를 다시 할당
+                    self?.post = post
+                }
+            }
         }
     }
+
+
     
     // MARK: - Configuration
     
     // 셀에 데이터를 설정하여 UI를 업데이트하는 메서드
-    func configure(with profileImageURL: URL?, displayName: String, largeImageURL: URL?) {
+    func configure(with profileImageURL: URL?, displayName: String, largeImageURL: URL?, post: Post) {
         // 이미지를 초기화하여 새 데이터가 로딩될 때 이전 이미지가 남아있는 문제를 방지
         userImageView.image = nil
         nameLabel.text = displayName
@@ -143,6 +169,10 @@ class UserPhotoCell: UITableViewCell {
             // 대표 이미지를 비동기적으로 로딩하고 표시
             largeImageView.loadImage(from: largeImageURL)
         }
+        
+        // 셀에 대한 데이터 설정
+        self.post = post
+        
     }
 }
 extension UIImageView {

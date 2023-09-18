@@ -12,7 +12,8 @@ struct Post: Codable {
     let imageURL: String
     let uid: String
     let timestamp: TimeInterval
-    let postID: String 
+    let postID: String
+    var likes: Likes // 좋아요 정보를 저장할 구조체 추가
     
     enum CodingKeys: String, CodingKey {
         case text
@@ -20,14 +21,16 @@ struct Post: Codable {
         case uid
         case timestamp
         case postID
+        case likes // 새로운 좋아요 구조체 추가
     }
     
-    init(text: String, imageURL: URL, uid: String, timestamp: TimeInterval, postID: String) {
+    init(text: String, imageURL: URL, uid: String, timestamp: TimeInterval, postID: String, likes: Likes) {
         self.text = text
         self.imageURL = imageURL.absoluteString
         self.uid = uid
         self.timestamp = timestamp
-        self.postID = postID // postID 초기화
+        self.postID = postID
+        self.likes = likes // 좋아요 정보 초기화
     }
     
     func formattedDate() -> String {
@@ -37,4 +40,3 @@ struct Post: Codable {
         return dateFormatter.string(from: postDate)
     }
 }
-

@@ -77,7 +77,8 @@ final class APIService {
             "imageURL": imageURL.absoluteString,
             "uid": uid,
             "timestamp": ServerValue.timestamp(),
-            "postID": postID 
+            "postID": postID,
+            "likes": ["usersLiked": []] // 빈 좋아요 정보 추가
         ]
         
         newPostRef.setValue(post) { error, _ in
@@ -87,9 +88,11 @@ final class APIService {
     
     // READ: Realtime Database에서 데이터 가져오는 메서드
     func fetchPosts(completion: @escaping ([Post], Error?) -> Void) {
+        // Firebase Realtime Database의 "posts" 경로에서 데이터를 가져옵니다.
         databaseRef.child("posts").observeSingleEvent(of: .value) { snapshot in
             var fetchedPosts: [Post] = []
-            
+
+            // 가져온 데이터 스냅샷을 순회합니다.
             for childSnapshot in snapshot.children {
                 if let childSnapshot = childSnapshot as? DataSnapshot,
                    let postDict = childSnapshot.value as? [String: Any],
@@ -98,17 +101,25 @@ final class APIService {
                    let uid = postDict["uid"] as? String,
                    let timestamp = postDict["timestamp"] as? TimeInterval,
                    let postID = postDict["postID"] as? String {
-                    
+
                     if let imageURL = URL(string: imageURLString) {
-                        let post = Post(text: text, imageURL: imageURL, uid: uid, timestamp: timestamp, postID: postID)
+                        // 좋아요 정보 가져오기
+                        let likesDict = postDict["likes"] as? [String: Any]
+                        let usersLiked = likesDict?["usersLiked"] as? [String] ?? []
+
+                        // Post 객체를 생성하고 배열에 추가합니다.
+                        let likes = Likes(usersLiked: usersLiked)
+                        let post = Post(text: text, imageURL: imageURL, uid: uid, timestamp: timestamp, postID: postID, likes: likes)
                         fetchedPosts.append(post)
                     }
                 }
             }
-            
+
+            // 완료 핸들러에 포스트 배열을 전달합니다.
             completion(fetchedPosts, nil)
         }
     }
+    
     
     // UPDATE: Realtime Database에서 데이터 수정하는 메서드
     func updatePost(postID: String, newText: String, completion: @escaping (Error?) -> Void) {
@@ -132,6 +143,32 @@ final class APIService {
             }
         }
     }
+    // 좋아요 상태를 업데이트하고 UI를 업데이트하는 메서드
+    func updateLikeStatus(for postID: String, currentUserUID: String, completion: @escaping (Error?) -> Void) {
+        databaseRef.child("posts").child(postID).observeSingleEvent(of: .value) { snapshot in
+            if let postDict = snapshot.value as? [String: Any] {
+                var likes = postDict["likes"] as? [String: Any] ?? [:]
+                var usersLiked = likes["usersLiked"] as? [String] ?? []
+
+                // 좋아요 상태 토글
+                if let index = usersLiked.firstIndex(of: currentUserUID) {
+                    usersLiked.remove(at: index)
+                } else {
+                    usersLiked.append(currentUserUID)
+                }
+
+                likes["usersLiked"] = usersLiked
+                // 업데이트된 좋아요 정보를 Realtime Database에 저장
+                self.databaseRef.child("posts").child(postID).child("likes").setValue(likes) { error, _ in
+                    completion(error)
+                }
+            } else {
+                // 해당 포스트를 찾을 수 없는 경우
+                completion(NetworkError.badRequest)
+            }
+        }
+    }
+
 }
 // 리사이징
 extension UIImage {

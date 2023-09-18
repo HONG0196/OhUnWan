@@ -103,7 +103,8 @@ extension HomeViewController: UITableViewDataSource {
             cell.configure(
                 with: profileImageURL,
                 displayName: user.displayName,
-                largeImageURL: largeImageURL
+                largeImageURL: largeImageURL,
+                post: post // 여기에서 데이터를 전달
             )
         }
         

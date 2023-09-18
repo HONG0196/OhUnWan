@@ -14,6 +14,7 @@ class HomeViewModel {
     private var databaseRef: DatabaseReference
     var posts: [Post] = [] // 게시물 데이터를 저장할 배열
     var users: [User] = [] // 사용자 데이터를 저장할 배열
+    var likedPostIDs: [String] = [] // 사용자가 좋아요한 게시물 ID 목록
     
     init() {
         databaseRef = Database.database().reference()
