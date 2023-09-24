@@ -109,14 +109,23 @@ extension HomeViewController: UITableViewDataSource {
         }
         
         // 좋아요 버튼의 동작 설정
-        cell.likeButton.addTarget(self, action: #selector(likeButtonTapped(_:)), for: .touchUpInside)
-        
+        // 클로저 설정
+        cell.likeButtonTappedHandler = { [weak self] in
+            self?.viewModel.fetchData { [weak self] error in
+                if let error = error {
+                    print("Error fetching data:", error)
+                } else {
+                    if let indexPath = self?.tableView.indexPath(for: cell) {
+                        self?.tableView.reloadRows(at: [indexPath], with: .none)
+                    }
+                }
+            }
+        }
         return cell
     }
     
     @objc private func likeButtonTapped(_ sender: UIButton) {
-        // 좋아요 버튼을 눌렀을 때 수행할 동작을 여기에 추가
-        // 예를 들어, 해당 셀의 인덱스를 가져와서 상태 변경 등의 로직을 구현
+
     }
 }
 

@@ -18,6 +18,8 @@ class UserPhotoCell: UITableViewCell {
     
     var resizedHeartImage: UIImage? // 리사이즈된 이미지 변수
     
+    var likeButtonTappedHandler: (() -> Void)?
+    
     // 작은 원형 유저 이미지를 표시하는 UIImageView
     let userImageView: UIImageView = {
         let imageView = UIImageView()
@@ -126,15 +128,6 @@ class UserPhotoCell: UITableViewCell {
             // 클라이언트 측의 토글 작업
             post.likes.toggleLike(forPost: post, currentUserUID: currentUserUID) // 좋아요 토글
             
-            // UI 업데이트 코드 (클라이언트 측)
-            if post.likes.usersLiked.contains(currentUserUID) {
-                self.likeButton.setImage(UIImage(named: "fillheart.png"), for: .normal)
-                print("Updated like status: Liked")
-            } else {
-                self.likeButton.setImage(self.resizedHeartImage, for: .normal)
-                print("Updated like status: Not liked")
-            }
-            
             // 서버에 좋아요 상태 업데이트 요청
             APIService.shared.updateLikeStatus(for: post.postID, currentUserUID: currentUserUID) { [weak self] error in
                 if let error = error {
@@ -142,10 +135,24 @@ class UserPhotoCell: UITableViewCell {
                 } else {
                     // 업데이트된 post를 다시 할당
                     self?.post = post
+                    
+                    // UI 업데이트 코드 (클라이언트 측)
+                    DispatchQueue.main.async {
+                        if post.likes.usersLiked.contains(currentUserUID) {
+                            self?.likeButton.setImage(UIImage(named: "fillheart.png"), for: .normal)
+                            print("Updated like status: Liked")
+                        } else {
+                            self?.likeButton.setImage(self?.resizedHeartImage, for: .normal)
+                            print("Updated like status: Not liked")
+                        }
+                        self?.likeButtonTappedHandler?() // 클로저를 호출하여 셀 리로딩 요청
+                    }
                 }
             }
         }
     }
+
+
 
 
     
@@ -153,26 +160,38 @@ class UserPhotoCell: UITableViewCell {
     
     // 셀에 데이터를 설정하여 UI를 업데이트하는 메서드
     func configure(with profileImageURL: URL?, displayName: String, largeImageURL: URL?, post: Post) {
-        // 이미지를 초기화하여 새 데이터가 로딩될 때 이전 이미지가 남아있는 문제를 방지
-        userImageView.image = nil
+        // 이름 설정
         nameLabel.text = displayName
-        largeImageView.image = nil
-        
+
+        // 게시물의 좋아요 상태에 따라 하트 이미지 업데이트
+        if let currentUserUID = AuthService.shared.getCurrentUserUID() {
+            if post.likes.usersLiked.contains(currentUserUID) {
+                self.likeButton.setImage(UIImage(named: "fillheart.png"), for: .normal)
+            } else {
+                self.likeButton.setImage(self.resizedHeartImage, for: .normal)
+            }
+        } else {
+            // 현재 사용자 UID를 가져올 수 없는 경우, 좋아요 버튼을 초기화 상태로 설정
+            self.likeButton.setImage(self.resizedHeartImage, for: .normal)
+        }
+
         // 프로필 이미지 설정
         if let profileImageURL = profileImageURL {
             // 프로필 이미지를 비동기적으로 로딩하고 표시
             userImageView.loadImage(from: profileImageURL)
         }
-        
+
         // 대표 이미지 설정
         if let largeImageURL = largeImageURL {
             // 대표 이미지를 비동기적으로 로딩하고 표시
             largeImageView.loadImage(from: largeImageURL)
+        } else {
+            // 대표 이미지 URL이 없는 경우, 이미지 뷰 초기화
+            largeImageView.image = nil
         }
-        
+
         // 셀에 대한 데이터 설정
         self.post = post
-        
     }
 }
 extension UIImageView {

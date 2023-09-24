@@ -20,7 +20,7 @@ class AuthService {
     func getCurrentUserUID() -> String? {
         let currentUser = Auth.auth().currentUser
         let uid = currentUser?.uid
-        print("Current user UID:", uid)
+        //print("Current user UID:", uid)
         return uid
     }
 

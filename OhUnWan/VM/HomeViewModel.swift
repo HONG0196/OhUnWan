@@ -23,13 +23,13 @@ class HomeViewModel {
     // 게시물과 사용자 데이터 가져오기
     func fetchData(completion: @escaping (Error?) -> Void) {
         let group = DispatchGroup()
-        var fetchError: Error?
+        var fetchErrors: [Error] = [] // 모든 오류를 저장할 배열
         
         // 게시물 데이터 가져오기
         group.enter()
         APIService.shared.fetchPosts { [weak self] fetchedPosts, error in
             if let error = error {
-                fetchError = error
+                fetchErrors.append(error)
             } else {
                 self?.posts = fetchedPosts
             }
@@ -40,7 +40,7 @@ class HomeViewModel {
         group.enter()
         AuthService.shared.fetchUsers { [weak self] fetchedUsers, error in
             if let error = error {
-                fetchError = error
+                fetchErrors.append(error)
             } else {
                 self?.users = fetchedUsers
             }
@@ -49,7 +49,17 @@ class HomeViewModel {
         
         // 모든 데이터가 가져와진 후 호출될 클로저
         group.notify(queue: .main) {
-            completion(fetchError)
+            if fetchErrors.isEmpty {
+                // 모든 데이터가 성공적으로 가져왔을 때
+                completion(nil)
+            } else {
+                // 오류가 하나라도 있을 때
+                let combinedError = NSError(domain: "com.yourapp.error", code: 0, userInfo: [
+                    NSLocalizedDescriptionKey: "Failed to fetch data.",
+                    NSLocalizedFailureReasonErrorKey: fetchErrors.map { $0.localizedDescription }.joined(separator: "\n")
+                ])
+                completion(combinedError)
+            }
             self.updateUIWithFetchedData() // 모든 데이터를 가져온 후에 업데이트
         }
     }
