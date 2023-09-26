@@ -84,6 +84,15 @@ class DetailViewController: UIViewController {
         return button
     }()
     
+    private let commentButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("댓글", for: .normal)
+        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
+        button.addTarget(self, action: #selector(commentButtonTapped), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -114,6 +123,7 @@ class DetailViewController: UIViewController {
         contentView.addSubview(mainImageView)
         contentView.addSubview(descriptionTextView)
         contentView.addSubview(saveButton)
+        contentView.addSubview(commentButton)
         
         // 제약 조건
         NSLayoutConstraint.activate([
@@ -130,7 +140,6 @@ class DetailViewController: UIViewController {
             
             // 컨텐츠 뷰의 높이
             contentView.heightAnchor.constraint(equalToConstant: 1000),
-            
             
             profileImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
             profileImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -149,11 +158,15 @@ class DetailViewController: UIViewController {
             descriptionTextView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             descriptionTextView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
+            // 댓글 버튼 위치 설정
+            commentButton.centerYAnchor.constraint(equalTo: saveButton.centerYAnchor), // 높이 중앙 정렬
+            commentButton.trailingAnchor.constraint(equalTo: view.leadingAnchor, constant: 50), // saveButton의 왼쪽에 배치
             
             saveButton.topAnchor.constraint(equalTo: descriptionTextView.bottomAnchor, constant: 20),
             saveButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             saveButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20)
         ])
+
         
         // Set values
         profileImageView.image = profileImage
@@ -240,5 +253,11 @@ class DetailViewController: UIViewController {
                 self?.navigationController?.popViewController(animated: true)
             }
         }
+    }
+    
+    @objc private func commentButtonTapped() {
+        // 댓글 창을 모달로 표시
+        let commentViewController = CommentViewController() // 댓글 창을 나타내는 뷰 컨트롤러를 만듭니다.
+        present(commentViewController, animated: true, completion: nil) // 모달로 표시
     }
 }
